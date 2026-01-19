@@ -1,4 +1,3 @@
-import "./App.css";
 import { SettingsProvider } from "./context/SettingsContext";
 import Home from "./pages/Home";
 
