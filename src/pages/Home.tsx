@@ -1,6 +1,9 @@
 import { useSettings } from "@/context/SettingsContext";
 import { useEffect, useState } from "react";
 import Settings from "./Settings";
+import placeHolderImg from "@/assets/wanaka.jpg";
+import { LuSettings } from "react-icons/lu";
+import { Button } from "@/components/ui/button";
 
 const proxy = "https://api.allorigins.win/get?url=";
 const bingUrl = encodeURIComponent(
@@ -29,12 +32,10 @@ function Home() {
                     url = `https://www.bing.com${imageUrl}`;
                 } catch (error) {
                     console.error("Error fetching Bing image:", error);
-                    url = "https://via.placeholder.com/1920x1080"; // Fallback
+                    url = placeHolderImg;
                 }
             } else if (settings.imageSource === "custom") {
-                url =
-                    settings.bgCustomUrl ||
-                    "https://via.placeholder.com/1920x1080";
+                url = settings.bgCustomUrl || placeHolderImg;
             }
             setBgImage(url);
         };
@@ -45,26 +46,20 @@ function Home() {
         return () => clearInterval(interval);
     }, [settings]);
 
-    if (showSettings) {
-        return <Settings onBack={() => setShowSettings(false)} />;
-    }
-
     return (
         <div
-            className="bg-cover bg-center bg-no-repeat min-h-screen w-full relative"
+            className="bg-cover bg-center bg-no-repeat min-h-screen w-full"
             style={{ backgroundImage: `url(${bgImage})` }}
         >
-            {/* Settings Button */}
-            <button
-                className="absolute top-4 right-4 bg-black bg-opacity-50 text-white p-2 rounded"
-                onClick={() => setShowSettings(true)}
+            {showSettings && <Settings onBack={() => setShowSettings(false)} />}
+            <Button
+                size="lg"
+                variant="ghost"
+                className="absolute bottom-4 right-4 text-white"
+                onClick={() => setShowSettings((v) => !v)}
             >
-                Settings
-            </button>
-
-            {/* Your existing app content */}
-            <h1 className="text-white">Pic Clock</h1>
-            {/* ...existing code... */}
+                <LuSettings size={30} />
+            </Button>
         </div>
     );
 }

@@ -24,10 +24,12 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({
     children,
 }) => {
     const [settings, setSettings] = useState<Settings>(defaultSettings);
+    const [isLoading, setLoading] = useState(true);
 
     useEffect(() => {
         const stored = localStorage.getItem("picClockSettings");
         if (stored) {
+            console.log("Loading settings from localStorage:", stored);
             try {
                 const parsed = JSON.parse(stored);
                 setSettings({ ...defaultSettings, ...parsed });
@@ -38,9 +40,12 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({
                 );
             }
         }
+        setLoading(false);
     }, []);
 
     useEffect(() => {
+        if (isLoading) return;
+        console.log("Saving settings to localStorage:", settings);
         localStorage.setItem("picClockSettings", JSON.stringify(settings));
     }, [settings]);
 
