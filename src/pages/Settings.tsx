@@ -4,10 +4,12 @@ import { Button } from "../components/ui/button"; // Assuming ShadCN Button
 import { Input } from "../components/ui/input"; // Assuming ShadCN Input
 import { RadioGroup, RadioGroupItem } from "../components/ui/radio-group"; // Assuming ShadCN RadioGroup
 import PhotoSelector from "./PhotoSelector";
+import { LuImageUp } from "react-icons/lu";
 
 const Settings: React.FC<{ onBack: () => void }> = ({ onBack }) => {
     const { settings, updateSettings } = useSettings();
     const [tempSettings, setTempSettings] = useState(settings);
+    const [showedPanel, setShowedPanel] = useState("main");
 
     const handleSave = () => {
         updateSettings(tempSettings);
@@ -16,10 +18,11 @@ const Settings: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 
     return (
         <div className="min-h-screen flex items-center justify-center">
-            {tempSettings.imageSource === "local" && <PhotoSelector />}
-            {tempSettings.imageSource !== "local" && (
-                <div className="p-6 w-md bg-white/25 dark:bg-gray-800/25 rounded-lg shadow-md backdrop-blur-md">
-                    <h2 className="text-xl font-bold mb-4">Settings</h2>
+            {showedPanel === "main" && (
+                <div className="p-6 w-md bg-white/25 dark:bg-gray-800/25 rounded-lg shadow-md backdrop-blur-lg">
+                    <h2 className="text-xl font-bold mb-4">
+                        Wallpaper Settings
+                    </h2>
 
                     <div className="mb-4">
                         <label className="block text-sm font-medium mb-2">
@@ -29,12 +32,16 @@ const Settings: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                             value={tempSettings.imageSource}
                             onValueChange={(
                                 value: "picsum" | "bing" | "custom" | "local",
-                            ) =>
+                            ) => {
                                 setTempSettings({
                                     ...tempSettings,
                                     imageSource: value,
-                                })
-                            }
+                                });
+
+                                if (value === "local") {
+                                    setShowedPanel("photoSelector");
+                                }
+                            }}
                         >
                             <div className="flex items-center space-x-2">
                                 <RadioGroupItem value="picsum" id="picsum" />
@@ -52,7 +59,12 @@ const Settings: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                             </div>
                             <div className="flex items-center space-x-2">
                                 <RadioGroupItem value="local" id="local" />
-                                <label htmlFor="local">Local Photos</label>
+                                <label
+                                    htmlFor="local"
+                                    className="flex items-center"
+                                >
+                                    Local Photos <LuImageUp className="ml-2" />
+                                </label>
                             </div>
                         </RadioGroup>
                     </div>
@@ -104,6 +116,9 @@ const Settings: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                         </Button>
                     </div>
                 </div>
+            )}
+            {showedPanel === "photoSelector" && (
+                <PhotoSelector onClose={() => setShowedPanel("main")} />
             )}
         </div>
     );

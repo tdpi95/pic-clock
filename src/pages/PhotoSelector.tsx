@@ -3,7 +3,7 @@ import { FiPlus, FiX } from "react-icons/fi";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
-const MAX_IMAGES = 99;
+const MAX_IMAGES = 60;
 
 export interface PhotoSelectorProps {
     onClose?: () => void;
@@ -38,26 +38,13 @@ export default function PhotoSelector({ onClose }: PhotoSelectorProps) {
 
     return (
         <div className="min-h-screen flex items-center justify-center p-4">
-            {/* Outer selector card (blurred) */}
             <Card className="w-full max-w-4xl rounded-xl bg-white/20 backdrop-blur-2xl shadow-xl">
-                <div className="p-6">
+                <div className="px-6 py-2">
                     <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-4">
-                        {/* Empty state: always render one full cell */}
-                        {images.length === 0 && showAddCell && (
-                            <button
-                                type="button"
-                                onClick={handleAddClick}
-                                className="w-30 flex aspect-square items-center justify-center rounded-xl border border-white bg-white/40 text-muted-foreground shadow transition hover:bg-white/90"
-                            >
-                                <FiPlus className="h-8 w-8" />
-                            </button>
-                        )}
-
-                        {/* Image cells */}
                         {images.map((src, index) => (
                             <div
                                 key={src}
-                                className="relative aspect-square overflow-hidden rounded-xl shadow"
+                                className="relative aspect-square overflow-hidden rounded-xl shadow w-30 h-30 border border-white"
                             >
                                 <img
                                     src={src}
@@ -67,7 +54,7 @@ export default function PhotoSelector({ onClose }: PhotoSelectorProps) {
                                 <Button
                                     size="icon"
                                     variant="destructive"
-                                    className="absolute top-2 right-2 h-7 w-7 rounded-full"
+                                    className="absolute top-1 right-1 h-7 w-7 rounded-full bg-destructive/70"
                                     onClick={() => removeImage(index)}
                                 >
                                     <FiX className="h-4 w-4" />
@@ -75,24 +62,18 @@ export default function PhotoSelector({ onClose }: PhotoSelectorProps) {
                             </div>
                         ))}
 
-                        {/* Plus cell after images */}
-                        {images.length > 0 && showAddCell && (
+                        {showAddCell && (
                             <button
                                 type="button"
                                 onClick={handleAddClick}
-                                className="flex aspect-square items-center justify-center rounded-xl border border-white bg-white/40 text-muted-foreground shadow transition hover:bg-white/90"
+                                className="w-30 flex aspect-square items-center justify-center rounded-xl border border-white bg-white/50 text-muted-foreground shadow transition hover:bg-white/90"
                             >
                                 <FiPlus className="h-8 w-8" />
                             </button>
                         )}
                     </div>
 
-                    <p className="mt-4 text-center text-sm text-muted-foreground">
-                        {images.length} / {MAX_IMAGES} images
-                    </p>
-
-                    {/* Close button */}
-                    <div className="mt-6 flex justify-center">
+                    <div className="mt-8 flex justify-center">
                         <Button
                             type="button"
                             variant="secondary"

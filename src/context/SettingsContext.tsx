@@ -16,7 +16,7 @@ const SettingsContext = createContext<SettingsContextType | undefined>(
 );
 
 const defaultSettings: Settings = {
-    imageSource: "picsum",
+    imageSource: "none",
     refreshInterval: 300000, // 5 minutes
 };
 
