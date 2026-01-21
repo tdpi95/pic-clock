@@ -2,6 +2,7 @@ import * as React from "react";
 import { FiPlus, FiX } from "react-icons/fi";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { useImageStore } from "@/hooks/useImageStore";
 
 const MAX_IMAGES = 60;
 
@@ -9,9 +10,43 @@ export interface PhotoSelectorProps {
     onClose?: () => void;
 }
 
+type Photo = {
+    id: string;
+    thumbUrl: string;
+};
+
 export default function PhotoSelector({ onClose }: PhotoSelectorProps) {
+    const photoStore = useImageStore("photos");
+    const [photos, setPhotos] = React.useState<Photo[]>([]);
+
     const [images, setImages] = React.useState<string[]>([]);
     const fileInputRef = React.useRef<HTMLInputElement | null>(null);
+
+    React.useEffect(() => {
+        let urls: string[] = [];
+
+        async function load() {
+            const ids = await photoStore.getAllKeys();
+
+            const items = await Promise.all(
+                ids.map(async (id) => {
+                    const thumbUrl = await photoStore.getThumbnailURL(id);
+                    if (!thumbUrl) return null;
+                    urls.push(thumbUrl);
+                    return { id, thumbUrl };
+                }),
+            );
+
+            setPhotos(items.filter(Boolean) as Photo[]);
+        }
+
+        load();
+
+        return () => {
+            // prevent memory leaks
+            urls.forEach(URL.revokeObjectURL);
+        };
+    }, [photoStore]);
 
     const handleAddClick = () => {
         fileInputRef.current?.click();

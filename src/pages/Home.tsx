@@ -15,6 +15,32 @@ function Home() {
     const [showSettings, setShowSettings] = useState(false);
 
     useEffect(() => {
+        const fetchImage = async () => {
+            let url = "";
+            if (settings.imageSource === "picsum") {
+                const timestamp = Date.now();
+                url = `https://picsum.photos/1920/1080?random=${timestamp}`;
+            } else if (settings.imageSource === "bing") {
+                try {
+                    const bUrl = `${proxy}${bingUrl}`;
+                    console.log("Fetching Bing image from: ", bUrl);
+                    const response = await fetch(bUrl);
+                    const data = await response.json();
+                    const contents = JSON.parse(data.contents);
+                    const imageUrl = contents.images[0].url;
+                    url = `https://www.bing.com${imageUrl}`;
+                } catch (error) {
+                    console.error("Error fetching Bing image:", error);
+                }
+            } else if (settings.imageSource === "custom") {
+                url = settings.bgCustomUrl || "";
+            }
+
+            if (url) {
+                setBgImage(url);
+            }
+        };
+
         fetchImage();
 
         let refreshMillis = 0;
@@ -34,32 +60,6 @@ function Home() {
 
         return () => clearInterval(interval);
     }, [settings]);
-
-    const fetchImage = async () => {
-        let url = "";
-        if (settings.imageSource === "picsum") {
-            const timestamp = Date.now();
-            url = `https://picsum.photos/1920/1080?random=${timestamp}`;
-        } else if (settings.imageSource === "bing") {
-            try {
-                const bUrl = `${proxy}${bingUrl}`;
-                console.log("Fetching Bing image from: ", bUrl);
-                const response = await fetch(bUrl);
-                const data = await response.json();
-                const contents = JSON.parse(data.contents);
-                const imageUrl = contents.images[0].url;
-                url = `https://www.bing.com${imageUrl}`;
-            } catch (error) {
-                console.error("Error fetching Bing image:", error);
-            }
-        } else if (settings.imageSource === "custom") {
-            url = settings.bgCustomUrl || "";
-        }
-
-        if (url) {
-            setBgImage(url);
-        }
-    };
 
     return (
         <div
