@@ -1,7 +1,7 @@
 import { ImageStore } from "@/db/ImageStore";
 import { useRef } from "react";
 
-export function useImageStore(storeName?: string): ImageStore {
+export function useImageStore(storeName: string): ImageStore {
     const storeRef = useRef<ImageStore | null>(null);
 
     if (!storeRef.current) {

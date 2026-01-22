@@ -1,6 +1,6 @@
 import { useSettings } from "@/context/SettingsContext";
 import { useEffect, useState } from "react";
-import Settings from "./Settings";
+import WallpaperSettings from "./WallpaperSettings";
 import { LuImage } from "react-icons/lu";
 import { Button } from "@/components/ui/button";
 
@@ -66,7 +66,9 @@ function Home() {
             className="bg-cover bg-center bg-no-repeat min-h-screen w-full bg-linear-to-r from-blue-500 to-teal-800"
             style={bgImage ? { backgroundImage: `url(${bgImage})` } : {}}
         >
-            {showSettings && <Settings onBack={() => setShowSettings(false)} />}
+            {showSettings && (
+                <WallpaperSettings onBack={() => setShowSettings(false)} />
+            )}
             <Button
                 size="lg"
                 variant="ghost"

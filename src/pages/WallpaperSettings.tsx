@@ -6,14 +6,14 @@ import { RadioGroup, RadioGroupItem } from "../components/ui/radio-group"; // As
 import PhotoSelector from "./PhotoSelector";
 import { LuImageUp } from "react-icons/lu";
 
-const Settings: React.FC<{ onBack: () => void }> = ({ onBack }) => {
+const WallpaperSettings: React.FC<{ onBack: () => void }> = ({ onBack }) => {
     const { settings, updateSettings } = useSettings();
     const [tempSettings, setTempSettings] = useState(settings);
     const [showedPanel, setShowedPanel] = useState("main");
 
     const handleSave = () => {
         updateSettings(tempSettings);
-        onBack(); // Navigate back after saving
+        onBack();
     };
 
     return (
@@ -37,10 +37,6 @@ const Settings: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                                     ...tempSettings,
                                     imageSource: value,
                                 });
-
-                                if (value === "local") {
-                                    setShowedPanel("photoSelector");
-                                }
                             }}
                         >
                             <div className="flex items-center space-x-2">
@@ -62,6 +58,9 @@ const Settings: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                                 <label
                                     htmlFor="local"
                                     className="flex items-center"
+                                    onClick={() =>
+                                        setShowedPanel("photoSelector")
+                                    }
                                 >
                                     Local Photos <LuImageUp className="ml-2" />
                                 </label>
@@ -124,4 +123,4 @@ const Settings: React.FC<{ onBack: () => void }> = ({ onBack }) => {
     );
 };
 
-export default Settings;
+export default WallpaperSettings;

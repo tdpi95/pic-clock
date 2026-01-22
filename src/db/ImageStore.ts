@@ -10,15 +10,13 @@ export type ImageRecord = {
 };
 
 export class ImageStore extends BaseIndexedDB<ImageRecord> {
-    constructor(storeName: string = "images") {
+    constructor(storeName: string) {
         super("media-db", storeName, 1);
     }
 
-    protected onUpgrade(db: IDBDatabase): void {
-        if (!db.objectStoreNames.contains("images")) {
-            db.createObjectStore("images", { keyPath: "id" });
-        }
-    }
+    // protected onUpgrade(db: IDBDatabase): void {
+    //     // No additional upgrade logic needed for now
+    // }
 
     async create(id: string, file: File): Promise<void> {
         const [original, thumbnail] = await Promise.all([

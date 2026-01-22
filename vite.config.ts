@@ -13,6 +13,7 @@ export default defineConfig({
     },
     build: {
         outDir: "docs",
+        sourcemap: true,
     },
     base: "/pic-clock/",
 });

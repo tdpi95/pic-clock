@@ -19,7 +19,6 @@ export default function PhotoSelector({ onClose }: PhotoSelectorProps) {
     const photoStore = useImageStore("photos");
     const [photos, setPhotos] = React.useState<Photo[]>([]);
 
-    const [images, setImages] = React.useState<string[]>([]);
     const fileInputRef = React.useRef<HTMLInputElement | null>(null);
 
     React.useEffect(() => {
@@ -56,33 +55,40 @@ export default function PhotoSelector({ onClose }: PhotoSelectorProps) {
         const files = Array.from(e.target.files ?? []);
         if (!files.length) return;
 
-        const remaining = MAX_IMAGES - images.length;
+        const remaining = MAX_IMAGES - photos.length;
         const selected = files.slice(0, remaining);
 
-        const newUrls = selected.map((file) => URL.createObjectURL(file));
-        setImages((prev) => [...prev, ...newUrls]);
+        for (const file of selected) {
+            const id = crypto.randomUUID();
+            photoStore.create(id, file).then(() => {
+                photoStore.getThumbnailURL(id).then((thumbUrl) => {
+                    if (thumbUrl) {
+                        setPhotos((prev) => [...prev, { id, thumbUrl }]);
+                    }
+                });
+            });
+        }
 
         e.target.value = "";
     };
 
-    const removeImage = (index: number) => {
-        setImages((prev) => prev.filter((_, i) => i !== index));
+    const removeImage = (id: string) => {
+        photoStore.delete(id);
+        setPhotos((prev) => prev.filter((photo) => photo.id !== id));
     };
-
-    const showAddCell = images.length < MAX_IMAGES;
 
     return (
         <div className="min-h-screen flex items-center justify-center p-4">
             <Card className="w-full max-w-4xl rounded-xl bg-white/20 backdrop-blur-2xl shadow-xl">
                 <div className="px-6 py-2">
                     <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-4">
-                        {images.map((src, index) => (
+                        {photos.map((photo, index) => (
                             <div
-                                key={src}
+                                key={photo.id}
                                 className="relative aspect-square overflow-hidden rounded-xl shadow w-30 h-30 border border-white"
                             >
                                 <img
-                                    src={src}
+                                    src={photo.thumbUrl}
                                     alt={`photo-${index}`}
                                     className="h-full w-full object-cover"
                                 />
@@ -90,14 +96,14 @@ export default function PhotoSelector({ onClose }: PhotoSelectorProps) {
                                     size="icon"
                                     variant="destructive"
                                     className="absolute top-1 right-1 h-7 w-7 rounded-full bg-destructive/70"
-                                    onClick={() => removeImage(index)}
+                                    onClick={() => removeImage(photo.id)}
                                 >
                                     <FiX className="h-4 w-4" />
                                 </Button>
                             </div>
                         ))}
 
-                        {showAddCell && (
+                        {photos.length < MAX_IMAGES && (
                             <button
                                 type="button"
                                 onClick={handleAddClick}

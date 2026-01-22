@@ -12,22 +12,29 @@ export abstract class BaseIndexedDB<T extends { id: string }> {
         this.dbPromise = this.openDB();
     }
 
-    protected abstract onUpgrade(
-        db: IDBDatabase,
-        oldVersion: number,
-        newVersion: number | null,
-    ): void;
+    // protected onUpgrade(
+    //     db: IDBDatabase,
+    //     oldVersion: number,
+    //     newVersion: number | null,
+    // ): void;
 
     private openDB(): Promise<IDBDatabase> {
         return new Promise((resolve, reject) => {
             const request = indexedDB.open(this.dbName, this.version);
 
             request.onupgradeneeded = () => {
-                this.onUpgrade(
-                    request.result,
-                    request.transaction?.db.version || 0,
-                    request.result.version,
-                );
+                const db = request.result;
+
+                if (!db.objectStoreNames.contains(this.storeName)) {
+                    db.createObjectStore(this.storeName, { keyPath: "id" });
+                    console.log(`Object store '${this.storeName}' created.`);
+                }
+
+                // this.onUpgrade(
+                //     request.result,
+                //     request.transaction?.db.version || 0,
+                //     request.result.version,
+                // );
             };
 
             request.onsuccess = () => {
