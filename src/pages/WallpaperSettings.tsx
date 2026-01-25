@@ -58,11 +58,14 @@ const WallpaperSettings: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                                 <label
                                     htmlFor="local"
                                     className="flex items-center"
-                                    onClick={() =>
-                                        setShowedPanel("photoSelector")
-                                    }
                                 >
-                                    Local Photos <LuImageUp className="ml-2" />
+                                    Local Photos{" "}
+                                    <LuImageUp
+                                        onClick={() =>
+                                            setShowedPanel("photoSelector")
+                                        }
+                                        className="ml-2 cursor-pointer"
+                                    />
                                 </label>
                             </div>
                         </RadioGroup>
@@ -88,26 +91,26 @@ const WallpaperSettings: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                         </div>
                     )}
 
-                    {/* Refresh Interval */}
-                    <div className="mb-4">
-                        <label className="block text-sm font-medium mb-2">
-                            Refresh Interval (minutes)
-                        </label>
-                        <Input
-                            type="number"
-                            min="1"
-                            value={tempSettings.refreshInterval / 60000} // Convert ms to minutes for display
-                            onChange={(e) =>
-                                setTempSettings({
-                                    ...tempSettings,
-                                    refreshInterval:
-                                        parseInt(e.target.value) * 60000, // Convert back to ms
-                                })
-                            }
-                        />
-                    </div>
+                    {tempSettings.imageSource !== "bing" && (
+                        <div className="mb-4">
+                            <label className="block text-sm font-medium mb-2">
+                                Refresh Interval (minutes)
+                            </label>
+                            <Input
+                                type="number"
+                                min="1"
+                                value={tempSettings.refreshInterval / 60000} // Convert ms to minutes for display
+                                onChange={(e) =>
+                                    setTempSettings({
+                                        ...tempSettings,
+                                        refreshInterval:
+                                            parseInt(e.target.value) * 60000, // Convert back to ms
+                                    })
+                                }
+                            />
+                        </div>
+                    )}
 
-                    {/* Buttons */}
                     <div className="flex space-x-2">
                         <Button onClick={handleSave}>Save</Button>
                         <Button variant="outline" onClick={onBack}>

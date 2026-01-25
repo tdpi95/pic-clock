@@ -4,6 +4,7 @@ interface Settings {
     imageSource: string;
     refreshInterval: number;
     bgCustomUrl?: string;
+    initialized?: boolean;
 }
 
 interface SettingsContextType {
@@ -18,6 +19,7 @@ const SettingsContext = createContext<SettingsContextType | undefined>(
 const defaultSettings: Settings = {
     imageSource: "picsum",
     refreshInterval: 300000, // 5 minutes
+    initialized: false,
 };
 
 export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({
@@ -45,6 +47,7 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({
 
     useEffect(() => {
         if (isLoading) return;
+        settings.initialized = true;
         console.log("Saving settings to localStorage:", settings);
         localStorage.setItem("picClockSettings", JSON.stringify(settings));
     }, [settings]);

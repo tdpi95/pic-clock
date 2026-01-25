@@ -125,3 +125,17 @@
         cursor: pointer;
     }
 }
+
+@theme {
+    @keyframes fade-in {
+        0% {
+            opacity: 0;
+            /* filter: blur(10px); */
+        }
+        100% {
+            opacity: 1;
+            /* filter: blur(0); */
+        }
+    }
+    --animate-fade-in: fade-in 1s ease-out;
+}
