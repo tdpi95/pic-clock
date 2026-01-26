@@ -5,6 +5,7 @@ import { Input } from "../components/ui/input"; // Assuming ShadCN Input
 import { RadioGroup, RadioGroupItem } from "../components/ui/radio-group"; // Assuming ShadCN RadioGroup
 import PhotoSelector from "./PhotoSelector";
 import { LuImageUp } from "react-icons/lu";
+import ImageURLForm from "./ImageURLForm";
 
 const WallpaperSettings: React.FC<{ onBack: () => void }> = ({ onBack }) => {
     const { settings, updateSettings } = useSettings();
@@ -19,7 +20,7 @@ const WallpaperSettings: React.FC<{ onBack: () => void }> = ({ onBack }) => {
     return (
         <div className="min-h-screen flex items-center justify-center">
             {showedPanel === "main" && (
-                <div className="p-6 w-md bg-white/25 dark:bg-gray-800/25 rounded-lg shadow-md backdrop-blur-lg">
+                <div className="p-6 w-md bg-white/30 dark:bg-gray-800/25 rounded-lg shadow-lg backdrop-blur-lg">
                     <h2 className="text-xl font-bold mb-4">
                         Wallpaper Settings
                     </h2>
@@ -52,27 +53,27 @@ const WallpaperSettings: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                             <div className="flex items-center space-x-2">
                                 <RadioGroupItem value="custom" id="custom" />
                                 <label htmlFor="custom">Custom URL</label>
+                                <LuImageUp
+                                    onClick={() =>
+                                        setShowedPanel("imageURLForm")
+                                    }
+                                    className="ml-2 cursor-pointer"
+                                />
                             </div>
                             <div className="flex items-center space-x-2">
                                 <RadioGroupItem value="local" id="local" />
-                                <label
-                                    htmlFor="local"
-                                    className="flex items-center"
-                                >
-                                    Local Photos{" "}
-                                    <LuImageUp
-                                        onClick={() =>
-                                            setShowedPanel("photoSelector")
-                                        }
-                                        className="ml-2 cursor-pointer"
-                                    />
-                                </label>
+                                <label htmlFor="local">Local Photos</label>
+                                <LuImageUp
+                                    onClick={() =>
+                                        setShowedPanel("photoSelector")
+                                    }
+                                    className="ml-2 cursor-pointer"
+                                />
                             </div>
                         </RadioGroup>
                     </div>
 
-                    {/* Custom URL Input (shown only if 'custom' is selected) */}
-                    {tempSettings.imageSource === "custom" && (
+                    {/* {tempSettings.imageSource === "custom" && (
                         <div className="mb-4">
                             <label className="block text-sm font-medium mb-2">
                                 Custom Image URL
@@ -89,7 +90,7 @@ const WallpaperSettings: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                                 placeholder="https://example.com/image.jpg"
                             />
                         </div>
-                    )}
+                    )} */}
 
                     {tempSettings.imageSource !== "bing" && (
                         <div className="mb-4">
@@ -119,8 +120,13 @@ const WallpaperSettings: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                     </div>
                 </div>
             )}
+
             {showedPanel === "photoSelector" && (
                 <PhotoSelector onClose={() => setShowedPanel("main")} />
+            )}
+
+            {showedPanel === "imageURLForm" && (
+                <ImageURLForm onClose={() => setShowedPanel("main")} />
             )}
         </div>
     );
