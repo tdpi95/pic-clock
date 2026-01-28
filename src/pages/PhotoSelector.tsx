@@ -1,10 +1,12 @@
 import * as React from "react";
-import { FiPlus, FiX } from "react-icons/fi";
-import { Card } from "@/components/ui/card";
+import { FiLink, FiPlus, FiUpload, FiX } from "react-icons/fi";
 import { Button } from "@/components/ui/button";
 import { useImageStore } from "@/hooks/useImageStore";
+import IconToggle from "@/components/ui/IconToggle";
 
 const MAX_IMAGES = 60;
+
+type AddMode = "file" | "url";
 
 export interface PhotoSelectorProps {
     onClose?: () => void;
@@ -18,6 +20,8 @@ type Photo = {
 export default function PhotoSelector({ onClose }: PhotoSelectorProps) {
     const photoStore = useImageStore("photos");
     const [photos, setPhotos] = React.useState<Photo[]>([]);
+
+    const [mode, setMode] = React.useState<AddMode>("file");
 
     const fileInputRef = React.useRef<HTMLInputElement | null>(null);
 
@@ -78,8 +82,8 @@ export default function PhotoSelector({ onClose }: PhotoSelectorProps) {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center p-4">
-            <Card className="w-full max-w-4xl rounded-xl bg-white/20 backdrop-blur-2xl shadow-xl">
+        <div className="min-h-screen w-full flex items-center justify-center">
+            <div className="w-full max-w-4xl p-8 rounded-xl bg-white/20 backdrop-blur-2xl shadow-xl">
                 <div className="px-6 py-2">
                     <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-4">
                         {photos.map((photo, index) => (
@@ -104,13 +108,25 @@ export default function PhotoSelector({ onClose }: PhotoSelectorProps) {
                         ))}
 
                         {photos.length < MAX_IMAGES && (
-                            <button
-                                type="button"
-                                onClick={handleAddClick}
-                                className="w-30 flex aspect-square items-center justify-center rounded-xl border border-white bg-white/50 text-muted-foreground shadow transition hover:bg-white/90"
-                            >
-                                <FiPlus className="h-8 w-8" />
-                            </button>
+                            <div className="relative w-30 flex flex-col aspect-square items-center justify-center rounded-xl border border-white bg-white/50 text-muted-foreground shadow-md">
+                                <button
+                                    type="button"
+                                    onClick={handleAddClick}
+                                    className="rounded-md hover:bg-white/90"
+                                >
+                                    <FiPlus className="h-10 w-10" />
+                                </button>
+                                <IconToggle
+                                    className="absolute bottom-1"
+                                    enabled={mode === "file"}
+                                    onChange={(s) =>
+                                        setMode(s ? "file" : "url")
+                                    }
+                                    leftIcon={<FiUpload />}
+                                    rightIcon={<FiLink />}
+                                    height={26}
+                                />
+                            </div>
                         )}
                     </div>
 
@@ -125,7 +141,7 @@ export default function PhotoSelector({ onClose }: PhotoSelectorProps) {
                         </Button>
                     </div>
                 </div>
-            </Card>
+            </div>
 
             <input
                 ref={fileInputRef}

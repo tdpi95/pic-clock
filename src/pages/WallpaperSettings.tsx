@@ -18,7 +18,7 @@ const WallpaperSettings: React.FC<{ onBack: () => void }> = ({ onBack }) => {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center">
+        <div className="absolute min-h-screen w-full flex items-center justify-center bg-black/30">
             {showedPanel === "main" && (
                 <div className="p-6 w-md bg-white/30 dark:bg-gray-800/25 rounded-lg shadow-lg backdrop-blur-lg">
                     <h2 className="text-xl font-bold mb-4">
@@ -50,7 +50,7 @@ const WallpaperSettings: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                                     Bing Image of the Day
                                 </label>
                             </div>
-                            <div className="flex items-center space-x-2">
+                            {/* <div className="flex items-center space-x-2">
                                 <RadioGroupItem value="custom" id="custom" />
                                 <label htmlFor="custom">Custom URL</label>
                                 <LuImageUp
@@ -59,7 +59,7 @@ const WallpaperSettings: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                                     }
                                     className="ml-2 cursor-pointer"
                                 />
-                            </div>
+                            </div> */}
                             <div className="flex items-center space-x-2">
                                 <RadioGroupItem value="local" id="local" />
                                 <label htmlFor="local">Local Photos</label>
@@ -72,25 +72,6 @@ const WallpaperSettings: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                             </div>
                         </RadioGroup>
                     </div>
-
-                    {/* {tempSettings.imageSource === "custom" && (
-                        <div className="mb-4">
-                            <label className="block text-sm font-medium mb-2">
-                                Custom Image URL
-                            </label>
-                            <Input
-                                type="url"
-                                value={tempSettings.bgCustomUrl}
-                                onChange={(e) =>
-                                    setTempSettings({
-                                        ...tempSettings,
-                                        bgCustomUrl: e.target.value,
-                                    })
-                                }
-                                placeholder="https://example.com/image.jpg"
-                            />
-                        </div>
-                    )} */}
 
                     {tempSettings.imageSource !== "bing" && (
                         <div className="mb-4">
