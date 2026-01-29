@@ -39,7 +39,6 @@ const DynamicToggle = ({
             role="switch"
             aria-checked={enabled}
         >
-            {/* Sliding Knob */}
             <div
                 style={{
                     height: `${knobSize}px`,
@@ -49,7 +48,6 @@ const DynamicToggle = ({
                 className="pointer-events-none rounded-full bg-white shadow transition-transform duration-300 ease-in-out"
             />
 
-            {/* Icons Overlay */}
             <div
                 className="absolute inset-0 flex items-center justify-between"
                 style={{ padding: `0 ${padding * 2}px` }}

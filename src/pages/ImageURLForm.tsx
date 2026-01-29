@@ -3,7 +3,17 @@ import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { LuPlus, LuTrash, LuX } from "react-icons/lu";
 
-export default function ImageURLForm({ onClose }: { onClose?: () => void }) {
+interface ImageURLFormProps {
+    onClose?: () => void;
+    onSave?: (urls: string[]) => void;
+    maxUrls?: number;
+}
+
+export default function ImageURLForm({
+    onClose,
+    onSave,
+    maxUrls = 1,
+}: ImageURLFormProps) {
     const [urls, setUrls] = useState<string[]>([""]);
 
     const addUrlField = () => {
@@ -38,8 +48,19 @@ export default function ImageURLForm({ onClose }: { onClose?: () => void }) {
         }
     };
 
+    const save = (urls: string[]) => {
+        if (onSave) {
+            urls.map((url) => url.trim()).filter((url) => url !== "");
+            onSave(urls);
+        }
+
+        if (onClose) {
+            onClose();
+        }
+    };
+
     return (
-        <div className="min-h-screen flex items-center justify-center">
+        <div className="absolute min-h-screen w-full flex items-center justify-center bg-black/50">
             <div className="p-6 w-md bg-white/30 dark:bg-gray-800/25 rounded-lg shadow-lg backdrop-blur-lg">
                 <Button
                     variant="ghost"
@@ -81,15 +102,27 @@ export default function ImageURLForm({ onClose }: { onClose?: () => void }) {
                             </Button>
                         </div>
                     ))}
+                    <div className="flex gap-2 items-center">
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={addUrlField}
+                            className="flex-1 bg-white/60"
+                            disabled={urls.length >= maxUrls}
+                        >
+                            <LuPlus className="w-4 h-4" />
+                        </Button>
+                        <span className="w-9" />
+                    </div>
                 </div>
 
                 <Button
-                    variant="outline"
+                    variant="default"
                     size="sm"
-                    onClick={addUrlField}
-                    className="mt-4"
+                    onClick={() => save(urls)}
+                    className="mt-5"
                 >
-                    <LuPlus className="w-4 h-4" />
+                    Save
                 </Button>
             </div>
         </div>

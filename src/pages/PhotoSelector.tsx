@@ -1,8 +1,9 @@
-import * as React from "react";
 import { FiLink, FiPlus, FiUpload, FiX } from "react-icons/fi";
 import { Button } from "@/components/ui/button";
 import { useImageStore } from "@/hooks/useImageStore";
 import IconToggle from "@/components/ui/IconToggle";
+import { useEffect, useRef, useState } from "react";
+import ImageURLForm from "./ImageURLForm";
 
 const MAX_IMAGES = 60;
 
@@ -19,13 +20,14 @@ type Photo = {
 
 export default function PhotoSelector({ onClose }: PhotoSelectorProps) {
     const photoStore = useImageStore("photos");
-    const [photos, setPhotos] = React.useState<Photo[]>([]);
+    const [photos, setPhotos] = useState<Photo[]>([]);
 
-    const [mode, setMode] = React.useState<AddMode>("file");
+    const [mode, setMode] = useState<AddMode>("file");
+    const [showUrlForm, setShowUrlForm] = useState(false);
 
-    const fileInputRef = React.useRef<HTMLInputElement | null>(null);
+    const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-    React.useEffect(() => {
+    useEffect(() => {
         let urls: string[] = [];
 
         async function load() {
@@ -51,8 +53,18 @@ export default function PhotoSelector({ onClose }: PhotoSelectorProps) {
         };
     }, [photoStore]);
 
-    const handleAddClick = () => {
-        fileInputRef.current?.click();
+    const handleAddClick = (mode: AddMode) => {
+        if (mode === "url") {
+            setShowUrlForm(true);
+        } else {
+            fileInputRef.current?.click();
+        }
+    };
+
+    const addUrls = (urls: string[]) => {
+        const remaining = MAX_IMAGES - photos.length;
+        const selected = urls.slice(0, remaining);
+        console.log("Adding URLs:", selected);
     };
 
     const handleFilesSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -111,16 +123,16 @@ export default function PhotoSelector({ onClose }: PhotoSelectorProps) {
                             <div className="relative w-30 flex flex-col aspect-square items-center justify-center rounded-xl border border-white bg-white/50 text-muted-foreground shadow-md">
                                 <button
                                     type="button"
-                                    onClick={handleAddClick}
+                                    onClick={() => handleAddClick(mode)}
                                     className="rounded-md hover:bg-white/90"
                                 >
                                     <FiPlus className="h-10 w-10" />
                                 </button>
                                 <IconToggle
                                     className="absolute bottom-1"
-                                    enabled={mode === "file"}
+                                    enabled={mode === "url"}
                                     onChange={(s) =>
-                                        setMode(s ? "file" : "url")
+                                        setMode(s ? "url" : "file")
                                     }
                                     leftIcon={<FiUpload />}
                                     rightIcon={<FiLink />}
@@ -133,15 +145,23 @@ export default function PhotoSelector({ onClose }: PhotoSelectorProps) {
                     <div className="mt-8 flex justify-center">
                         <Button
                             type="button"
-                            variant="secondary"
+                            variant="default"
                             className="rounded-full px-8"
                             onClick={onClose}
                         >
-                            Close
+                            OK
                         </Button>
                     </div>
                 </div>
             </div>
+
+            {showUrlForm && (
+                <ImageURLForm
+                    onClose={() => setShowUrlForm(false)}
+                    onSave={(urls) => addUrls(urls)}
+                    maxUrls={MAX_IMAGES - photos.length}
+                />
+            )}
 
             <input
                 ref={fileInputRef}
