@@ -4,6 +4,7 @@ import { useImageStore } from "@/hooks/useImageStore";
 import IconToggle from "@/components/ui/IconToggle";
 import { useEffect, useRef, useState } from "react";
 import ImageURLForm from "./ImageURLForm";
+import { useSettings } from "@/context/SettingsContext";
 
 const MAX_IMAGES = 60;
 
@@ -20,9 +21,10 @@ type Photo = {
 
 export default function PhotoSelector({ onClose }: PhotoSelectorProps) {
     const photoStore = useImageStore("photos");
+    const { settings, updateSettings } = useSettings();
     const [photos, setPhotos] = useState<Photo[]>([]);
 
-    const [mode, setMode] = useState<AddMode>("file");
+    const [mode, setMode] = useState<AddMode>(settings.uploadMode);
     const [showUrlForm, setShowUrlForm] = useState(false);
 
     const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -61,22 +63,15 @@ export default function PhotoSelector({ onClose }: PhotoSelectorProps) {
         }
     };
 
-    const addUrls = (urls: string[]) => {
-        const remaining = MAX_IMAGES - photos.length;
-        const selected = urls.slice(0, remaining);
-        console.log("Adding URLs:", selected);
-    };
-
-    const handleFilesSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const files = Array.from(e.target.files ?? []);
-        if (!files.length) return;
+    const addBlobs = (blobs: Blob[]) => {
+        if (!blobs.length) return;
 
         const remaining = MAX_IMAGES - photos.length;
-        const selected = files.slice(0, remaining);
+        const selected = blobs.slice(0, remaining);
 
-        for (const file of selected) {
+        for (const blob of selected) {
             const id = crypto.randomUUID();
-            photoStore.create(id, file).then(() => {
+            photoStore.create(id, blob).then(() => {
                 photoStore.getThumbnailURL(id).then((thumbUrl) => {
                     if (thumbUrl) {
                         setPhotos((prev) => [...prev, { id, thumbUrl }]);
@@ -84,6 +79,32 @@ export default function PhotoSelector({ onClose }: PhotoSelectorProps) {
                 });
             });
         }
+    };
+
+    const addUrls = (urls: string[]) => {
+        const remaining = MAX_IMAGES - photos.length;
+        const selected = urls.slice(0, remaining);
+        console.log("Adding URLs:", selected);
+        const blobs = selected.map(async (url) => {
+            try {
+                const res = await fetch(url);
+                return await res.blob();
+            } catch (err) {
+                console.error("Failed to fetch image from URL:", url, err);
+                return null;
+            }
+        });
+
+        Promise.all(blobs).then((results) => {
+            const validBlobs = results.filter((b): b is Blob => b !== null);
+            addBlobs(validBlobs);
+        });
+    };
+
+    const handleFilesSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const files = Array.from(e.target.files ?? []);
+
+        addBlobs(files);
 
         e.target.value = "";
     };
@@ -131,9 +152,11 @@ export default function PhotoSelector({ onClose }: PhotoSelectorProps) {
                                 <IconToggle
                                     className="absolute bottom-1"
                                     enabled={mode === "url"}
-                                    onChange={(s) =>
-                                        setMode(s ? "url" : "file")
-                                    }
+                                    onChange={(s) => {
+                                        const newMode = s ? "url" : "file";
+                                        setMode(newMode);
+                                        updateSettings({ uploadMode: newMode });
+                                    }}
                                     leftIcon={<FiUpload />}
                                     rightIcon={<FiLink />}
                                     height={26}

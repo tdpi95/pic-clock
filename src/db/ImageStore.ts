@@ -18,7 +18,7 @@ export class ImageStore extends BaseIndexedDB<ImageRecord> {
     //     // No additional upgrade logic needed for now
     // }
 
-    async create(id: string, file: File): Promise<void> {
+    async create(id: string, file: Blob): Promise<void> {
         const [original, thumbnail] = await Promise.all([
             compressImage(file),
             createThumbnail(file),

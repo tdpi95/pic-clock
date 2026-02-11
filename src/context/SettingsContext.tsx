@@ -3,7 +3,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 interface Settings {
     imageSource: string;
     refreshInterval: number;
-    bgCustomUrl?: string;
+    uploadMode: "file" | "url";
     initialized?: boolean;
 }
 
@@ -19,6 +19,7 @@ const SettingsContext = createContext<SettingsContextType | undefined>(
 const defaultSettings: Settings = {
     imageSource: "picsum",
     refreshInterval: 300000, // 5 minutes
+    uploadMode: "file",
     initialized: false,
 };
 
