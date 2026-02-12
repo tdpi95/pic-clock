@@ -4,6 +4,7 @@ import WallpaperSettings from "./WallpaperSettings";
 import { LuImage } from "react-icons/lu";
 import { Button } from "@/components/ui/button";
 import { useImageStore } from "@/hooks/useImageStore";
+import Footer from "@/components/Footer";
 
 const proxy = "https://whateverorigin.org/get?url=";
 const bingUrl = encodeURIComponent(
@@ -144,14 +145,18 @@ function Home() {
             {showSettings && (
                 <WallpaperSettings onBack={() => setShowSettings(false)} />
             )}
-            <Button
-                size="lg"
-                variant="ghost"
-                className="absolute bottom-4 right-4 text-white"
-                onClick={() => setShowSettings((v) => !v)}
-            >
-                <LuImage size={30} />
-            </Button>
+
+            <Footer
+                leftButtons={
+                    <Button
+                        size="lg"
+                        variant="ghost"
+                        onClick={() => setShowSettings((v) => !v)}
+                    >
+                        <LuImage size={30} />
+                    </Button>
+                }
+            />
         </div>
     );
 }
