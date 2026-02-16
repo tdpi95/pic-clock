@@ -1,7 +1,7 @@
 import { useSettings } from "@/context/SettingsContext";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import WallpaperSettings from "./WallpaperSettings";
-import { LuImage } from "react-icons/lu";
+import { LuFullscreen, LuImage } from "react-icons/lu";
 import { Button } from "@/components/ui/button";
 import { useImageStore } from "@/hooks/useImageStore";
 import Footer from "@/components/Footer";
@@ -35,6 +35,8 @@ const getBingImageUrl = async () => {
 function Home() {
     const { settings } = useSettings();
     const [showSettings, setShowSettings] = useState(false);
+    const imgRef = useRef<HTMLImageElement | null>(null);
+    const containerRef = useRef<HTMLDivElement | null>(null);
 
     const photoStore = useImageStore("photos");
     const [photoKeys, setPhotoKeys] = useState<string[]>([]);
@@ -108,7 +110,7 @@ function Home() {
                 handleNext();
             }
         }
-    }, [settings.imageSource, settings.initialized]);
+    }, [settings.imageSource, settings.initialized, photoStore]);
 
     useEffect(() => {
         if (photoKeys.length > 0) {
@@ -116,8 +118,26 @@ function Home() {
         }
     }, [photoKeys]);
 
+    const toggleFullscreen = () => {
+        if (!containerRef.current) return;
+
+        if (!document.fullscreenElement) {
+            containerRef.current.requestFullscreen().catch((err) => {
+                console.error(
+                    "Error attempting to enable fullscreen mode:",
+                    err,
+                );
+            });
+        } else {
+            document.exitFullscreen();
+        }
+    };
+
     return (
-        <div className="relative min-h-screen w-full bg-linear-to-r from-blue-500 to-teal-800">
+        <div
+            className="relative min-h-screen w-full bg-linear-to-r from-blue-500 to-teal-800"
+            ref={containerRef}
+        >
             {prevUrl && (
                 <img
                     src={prevUrl}
@@ -130,6 +150,7 @@ function Home() {
                     key={currentUrl}
                     src={currentUrl}
                     className="absolute inset-0 h-full w-full object-cover animate-fade-in"
+                    ref={imgRef}
                 />
             )}
 
@@ -147,14 +168,24 @@ function Home() {
             )}
 
             <Footer
-                leftButtons={
-                    <Button
-                        size="lg"
-                        variant="ghost"
-                        onClick={() => setShowSettings((v) => !v)}
-                    >
-                        <LuImage size={30} />
-                    </Button>
+                triggerElementRef={imgRef}
+                rightElement={
+                    <div className="flex gap-2">
+                        <Button
+                            size="lg"
+                            variant="ghost"
+                            onClick={() => setShowSettings((v) => !v)}
+                        >
+                            <LuImage size={30} />
+                        </Button>
+                        <Button
+                            size="lg"
+                            variant="ghost"
+                            onClick={toggleFullscreen}
+                        >
+                            <LuFullscreen size={30} />
+                        </Button>
+                    </div>
                 }
             />
         </div>

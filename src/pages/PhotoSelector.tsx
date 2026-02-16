@@ -5,6 +5,7 @@ import IconToggle from "@/components/ui/IconToggle";
 import { useEffect, useRef, useState } from "react";
 import ImageURLForm from "./ImageURLForm";
 import { useSettings } from "@/context/SettingsContext";
+import { generateUUID } from "@/lib/utils";
 
 const MAX_IMAGES = 60;
 
@@ -30,7 +31,7 @@ export default function PhotoSelector({ onClose }: PhotoSelectorProps) {
     const fileInputRef = useRef<HTMLInputElement | null>(null);
 
     useEffect(() => {
-        let urls: string[] = [];
+        const urls: string[] = [];
 
         async function load() {
             const ids = await photoStore.getAllKeys();
@@ -70,7 +71,7 @@ export default function PhotoSelector({ onClose }: PhotoSelectorProps) {
         const selected = blobs.slice(0, remaining);
 
         for (const blob of selected) {
-            const id = crypto.randomUUID();
+            const id = generateUUID();
             photoStore.create(id, blob).then(() => {
                 photoStore.getThumbnailURL(id).then((thumbUrl) => {
                     if (thumbUrl) {
