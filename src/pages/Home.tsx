@@ -5,6 +5,7 @@ import { LuFullscreen, LuImage } from "react-icons/lu";
 import { Button } from "@/components/ui/button";
 import { useImageStore } from "@/hooks/useImageStore";
 import Footer from "@/components/Footer";
+import { useWakeLock } from "@/hooks/useWakeLock";
 
 const proxy = "https://whateverorigin.org/get?url=";
 const bingUrl = encodeURIComponent(
@@ -35,6 +36,8 @@ const getBingImageUrl = async () => {
 function Home() {
     const { settings } = useSettings();
     const [showSettings, setShowSettings] = useState(false);
+    const { autoHandle } = useWakeLock(5 * 60000);
+
     const imgRef = useRef<HTMLImageElement | null>(null);
     const containerRef = useRef<HTMLDivElement | null>(null);
 
@@ -74,6 +77,13 @@ function Home() {
         setCurrentUrl(pendingUrl);
         setPendingUrl(null);
     };
+
+    useEffect(() => {
+        const auto = autoHandle();
+        return () => {
+            auto();
+        };
+    }, []);
 
     useEffect(() => {
         if (!settings.initialized) return;

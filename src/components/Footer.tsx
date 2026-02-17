@@ -25,11 +25,8 @@ const Footer: React.FC<StickyFooterProps> = ({
         if (timerRef.current) clearTimeout(timerRef.current);
 
         timerRef.current = setTimeout(() => {
-            console.log("Timer ended, hiding footer");
             setIsVisible(false);
         }, 5000);
-
-        console.log("Timer started");
     }, []);
 
     useEffect(() => {
@@ -50,13 +47,13 @@ const Footer: React.FC<StickyFooterProps> = ({
             }
         };
 
-        document.addEventListener("mousedown", handleInteraction);
+        addEventListener("mousedown", handleInteraction);
 
         return () => {
-            document.removeEventListener("mousedown", handleInteraction);
+            removeEventListener("mousedown", handleInteraction);
             if (timerRef.current) clearTimeout(timerRef.current);
         };
-    }, [startTimer]);
+    }, [startTimer, triggerElementRef]);
 
     return (
         <footer
