@@ -3,7 +3,7 @@ import { toast } from "sonner";
 
 /**
  *
- * @param duration in millis
+ * @param duration in millis. -1: disable, 0: always on, >0: auto release after duration
  * @returns
  */
 export const useWakeLock = (duration: number) => {
@@ -12,27 +12,35 @@ export const useWakeLock = (duration: number) => {
     const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     const requestLock = async () => {
+        if (duration < 0) return;
+
         console.log("navigator:", navigator);
 
-        const navObj: Record<string, unknown> = {};
-        for (const key in navigator) {
-            const value = navigator[key as keyof Navigator];
+        // const navObj: Record<string, unknown> = {};
+        // for (const key in navigator) {
+        //     const value = navigator[key as keyof Navigator];
 
-            if (typeof value !== "function") {
-                navObj[key] = value;
-            }
-        }
+        //     if (typeof value !== "function") {
+        //         navObj[key] = value;
+        //     }
+        // }
 
         if ("wakeLock" in navigator) {
             try {
                 wakeLockRef.current =
                     await navigator.wakeLock.request("screen");
                 setIsActive(true);
-                console.log("Screen Wake Lock is active");
+                console.log("Screen wake lock is active");
+                toast.success("Screen wake lock is active", {
+                    position: "top-left",
+                });
 
                 wakeLockRef.current.addEventListener("release", () => {
                     setIsActive(false);
-                    console.log("Screen Wake Lock was released");
+                    console.log("Screen wake lock was released");
+                    toast.success("Screen wake lock was released", {
+                        position: "top-left",
+                    });
                 });
             } catch (err: unknown) {
                 if (err instanceof Error) {
@@ -42,16 +50,24 @@ export const useWakeLock = (duration: number) => {
         } else {
             console.error("Wake Lock API not supported in this browser");
             toast.error("Wake Lock API not supported in this browser", {
-                description: JSON.stringify(navObj),
                 position: "top-left",
-                duration: 20000,
+                duration: 5000,
             });
         }
     };
 
     const releaseLock = async () => {
         if (wakeLockRef.current) {
-            await wakeLockRef.current.release();
+            try {
+                await wakeLockRef.current.release();
+            } catch (err: unknown) {
+                if (err instanceof Error) {
+                    toast.error(
+                        `Error releasing wake lock: ${err.name}, ${err.message}`,
+                    );
+                }
+                console.error("Error releasing wake lock:", err);
+            }
             wakeLockRef.current = null;
         }
     };
@@ -62,7 +78,7 @@ export const useWakeLock = (duration: number) => {
         if (timerRef.current) clearTimeout(timerRef.current);
 
         timerRef.current = setTimeout(() => {
-            alert("Wake lock timed out!");
+            toast("Releasing wake lock...");
             releaseLock();
         }, duration);
 
@@ -81,10 +97,8 @@ export const useWakeLock = (duration: number) => {
         };
 
         const handleClick = async () => {
-            if (wakeLockRef.current !== null) {
-                await requestLock();
-                startTimer();
-            }
+            await requestLock();
+            startTimer();
         };
 
         addEventListener("click", handleClick);
