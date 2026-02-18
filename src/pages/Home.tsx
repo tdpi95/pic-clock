@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useImageStore } from "@/hooks/useImageStore";
 import Footer from "@/components/Footer";
 import { useWakeLock } from "@/hooks/useWakeLock";
+import { Toaster } from "sonner";
 
 const proxy = "https://whateverorigin.org/get?url=";
 const bingUrl = encodeURIComponent(
@@ -176,6 +177,8 @@ function Home() {
             {showSettings && (
                 <WallpaperSettings onBack={() => setShowSettings(false)} />
             )}
+
+            <Toaster />
 
             <Footer
                 triggerElementRef={imgRef}

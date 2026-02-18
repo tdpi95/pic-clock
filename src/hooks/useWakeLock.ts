@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
 
 /**
  *
@@ -12,6 +13,16 @@ export const useWakeLock = (duration: number) => {
 
     const requestLock = async () => {
         console.log("navigator:", navigator);
+
+        const navObj: Record<string, unknown> = {};
+        for (const key in navigator) {
+            const value = navigator[key as keyof Navigator];
+
+            if (typeof value !== "function") {
+                navObj[key] = value;
+            }
+        }
+
         if ("wakeLock" in navigator) {
             try {
                 wakeLockRef.current =
@@ -30,6 +41,11 @@ export const useWakeLock = (duration: number) => {
             }
         } else {
             console.error("Wake Lock API not supported in this browser");
+            toast.error("Wake Lock API not supported in this browser", {
+                description: JSON.stringify(navObj),
+                position: "top-left",
+                duration: 20000,
+            });
         }
     };
 
@@ -93,10 +109,8 @@ export const useWakeLock = (duration: number) => {
         };
 
         const handleClick = async () => {
-            if (wakeLockRef.current !== null) {
-                await requestLock();
-                startTimer();
-            }
+            await requestLock();
+            startTimer();
         };
 
         requestLock();
