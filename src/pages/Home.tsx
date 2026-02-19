@@ -7,6 +7,7 @@ import { useImageStore } from "@/hooks/useImageStore";
 import Footer from "@/components/Footer";
 import { useWakeLock } from "@/hooks/useWakeLock";
 import { Toaster } from "sonner";
+import FloatingClock from "@/components/FloatingClock";
 
 const proxy = "https://whateverorigin.org/get?url=";
 const bingUrl = encodeURIComponent(
@@ -170,6 +171,8 @@ function Home() {
                     alt=""
                 />
             )}
+
+            <FloatingClock />
 
             {showSettings && (
                 <WallpaperSettings onBack={() => setShowSettings(false)} />
