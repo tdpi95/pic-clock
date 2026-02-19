@@ -37,7 +37,7 @@ const getBingImageUrl = async () => {
 function Home() {
     const { settings } = useSettings();
     const [showSettings, setShowSettings] = useState(false);
-    const { autoHandle } = useWakeLock(5 * 60000);
+    const { changeDuration } = useWakeLock(-1);
 
     const imgRef = useRef<HTMLImageElement | null>(null);
     const containerRef = useRef<HTMLDivElement | null>(null);
@@ -80,11 +80,8 @@ function Home() {
     };
 
     useEffect(() => {
-        const auto = autoHandle();
-        return () => {
-            auto();
-        };
-    }, []);
+        changeDuration(settings.wakeLockDuration);
+    }, [changeDuration, settings.wakeLockDuration]);
 
     useEffect(() => {
         if (!settings.initialized) return;
@@ -93,7 +90,7 @@ function Home() {
         switch (settings.imageSource) {
             case "picsum":
             case "local":
-                refreshMillis = settings.refreshInterval;
+                refreshMillis = settings.imageChangeInterval;
                 break;
             case "bing":
                 refreshMillis = 60 * 60 * 1000; // 1 hour

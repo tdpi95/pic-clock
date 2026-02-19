@@ -2,8 +2,9 @@ import { createContext, useContext, useEffect, useState } from "react";
 
 interface Settings {
     imageSource: string;
-    refreshInterval: number;
+    imageChangeInterval: number;
     uploadMode: "file" | "url";
+    wakeLockDuration: number;
     initialized?: boolean;
 }
 
@@ -18,8 +19,9 @@ const SettingsContext = createContext<SettingsContextType | undefined>(
 
 const defaultSettings: Settings = {
     imageSource: "picsum",
-    refreshInterval: 300000, // 5 minutes
+    imageChangeInterval: 300000, // 5 minutes
     uploadMode: "file",
+    wakeLockDuration: 300000, // 5 minutes
     initialized: false,
 };
 

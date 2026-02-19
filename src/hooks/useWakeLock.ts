@@ -3,18 +3,20 @@ import { toast } from "sonner";
 
 /**
  *
- * @param duration in millis. -1: disable, 0: always on, >0: auto release after duration
+ * @param initDuration in millis. -1: disable, 0: always on, >0: auto release after duration
  * @returns
  */
-export const useWakeLock = (duration: number) => {
+export const useWakeLock = (initDuration: number) => {
     const [isActive, setIsActive] = useState(false);
     const wakeLockRef = useRef<WakeLockSentinel>(null);
     const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const [duration, setDuration] = useState(initDuration);
+    const showedErrorRef = useRef(false);
 
-    const requestLock = async () => {
-        if (duration < 0) return;
+    const requestLock = useCallback(async () => {
+        if (duration < 0) return; // don't request if disabled
 
-        console.log("navigator:", navigator);
+        // console.log("navigator:", navigator);
 
         // const navObj: Record<string, unknown> = {};
         // for (const key in navigator) {
@@ -30,10 +32,9 @@ export const useWakeLock = (duration: number) => {
                 wakeLockRef.current =
                     await navigator.wakeLock.request("screen");
                 setIsActive(true);
-                console.log("Screen wake lock is active");
-                toast.success("Screen wake lock is active", {
-                    position: "top-left",
-                });
+                console.log(
+                    "Screen wake lock is active for " + duration + " ms",
+                );
 
                 wakeLockRef.current.addEventListener("release", () => {
                     setIsActive(false);
@@ -49,12 +50,14 @@ export const useWakeLock = (duration: number) => {
             }
         } else {
             console.error("Wake Lock API not supported in this browser");
-            toast.error("Wake Lock API not supported in this browser", {
-                position: "top-left",
-                duration: 5000,
-            });
+            if (!showedErrorRef.current) {
+                toast.error("Wake lock API is not supported in this browser", {
+                    position: "top-left",
+                });
+                showedErrorRef.current = true;
+            }
         }
-    };
+    }, [duration]);
 
     const releaseLock = async () => {
         if (wakeLockRef.current) {
@@ -73,7 +76,7 @@ export const useWakeLock = (duration: number) => {
     };
 
     const startTimer = useCallback(() => {
-        if (duration <= 0) return;
+        if (duration <= 0) return; // don't start timer if always on or disabled
 
         if (timerRef.current) clearTimeout(timerRef.current);
 
@@ -86,32 +89,8 @@ export const useWakeLock = (duration: number) => {
     }, [duration]);
 
     useEffect(() => {
-        const handleVisibilityChange = async () => {
-            if (
-                wakeLockRef.current !== null &&
-                document.visibilityState === "visible"
-            ) {
-                await requestLock();
-                startTimer();
-            }
-        };
+        if (duration < 0) return;
 
-        const handleClick = async () => {
-            await requestLock();
-            startTimer();
-        };
-
-        addEventListener("click", handleClick);
-        addEventListener("visibilitychange", handleVisibilityChange);
-
-        return () => {
-            removeEventListener("visibilitychange", handleVisibilityChange);
-            removeEventListener("click", handleClick);
-            if (timerRef.current) clearTimeout(timerRef.current);
-        };
-    }, [startTimer]);
-
-    const autoHandle = () => {
         const handleVisibilityChange = async () => {
             if (
                 wakeLockRef.current !== null &&
@@ -137,7 +116,11 @@ export const useWakeLock = (duration: number) => {
             removeEventListener("click", handleClick);
             if (timerRef.current) clearTimeout(timerRef.current);
         };
+    }, [duration]);
+
+    const changeDuration = (dur: number) => {
+        setDuration(dur);
     };
 
-    return { isActive, requestLock, releaseLock, autoHandle };
+    return { isActive, requestLock, releaseLock, changeDuration };
 };

@@ -1,20 +1,62 @@
 import React, { useState } from "react";
 import { useSettings } from "../context/SettingsContext";
-import { Button } from "../components/ui/button"; // Assuming ShadCN Button
-import { Input } from "../components/ui/input"; // Assuming ShadCN Input
-import { RadioGroup, RadioGroupItem } from "../components/ui/radio-group"; // Assuming ShadCN RadioGroup
+import { Button } from "../components/ui/button";
+import { RadioGroup, RadioGroupItem } from "../components/ui/radio-group";
 import PhotoSelector from "./PhotoSelector";
 import { LuImageUp } from "react-icons/lu";
 import ImageURLForm from "./ImageURLForm";
+import { NumberSelect } from "@/components/NumberSelect";
 
 const WallpaperSettings: React.FC<{ onBack: () => void }> = ({ onBack }) => {
     const { settings, updateSettings } = useSettings();
     const [tempSettings, setTempSettings] = useState(settings);
     const [showedPanel, setShowedPanel] = useState("main");
+    const [intervalMinutes, setIntervalMinutes] = useState<number | "">(
+        settings.imageChangeInterval / 60000,
+    );
+    const [wakeLockValue, setWakeLockValue] = useState<number | string>(
+        settings.wakeLockDuration === -1
+            ? "Disabled"
+            : settings.wakeLockDuration === 0
+              ? "Always on"
+              : settings.wakeLockDuration / 60000,
+    );
 
     const handleSave = () => {
         updateSettings(tempSettings);
         onBack();
+    };
+
+    const handleWakeLockValueChange = (value: number | string) => {
+        console.log("Wake lock value change:", value);
+        setWakeLockValue(value);
+        let duration;
+        if (value === "Disabled") {
+            duration = -1;
+        } else if (value === "Always on") {
+            duration = 0;
+        } else if (typeof value === "number") {
+            duration = value * 60000;
+        } else {
+            console.warn("Invalid wake lock value:", value);
+            return;
+        }
+
+        setTempSettings({
+            ...tempSettings,
+            wakeLockDuration: duration,
+        });
+    };
+
+    const handleInterValMinutesChange = (value: number | string) => {
+        if (typeof value === "string") return;
+
+        setIntervalMinutes(value);
+
+        setTempSettings({
+            ...tempSettings,
+            imageChangeInterval: value * 60000,
+        });
     };
 
     return (
@@ -50,16 +92,6 @@ const WallpaperSettings: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                                     Bing Image of the Day
                                 </label>
                             </div>
-                            {/* <div className="flex items-center space-x-2">
-                                <RadioGroupItem value="custom" id="custom" />
-                                <label htmlFor="custom">Custom URL</label>
-                                <LuImageUp
-                                    onClick={() =>
-                                        setShowedPanel("imageURLForm")
-                                    }
-                                    className="ml-2 cursor-pointer"
-                                />
-                            </div> */}
                             <div className="flex items-center space-x-2">
                                 <RadioGroupItem value="local" id="local" />
                                 <label htmlFor="local">Local Photos</label>
@@ -76,22 +108,30 @@ const WallpaperSettings: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                     {tempSettings.imageSource !== "bing" && (
                         <div className="mb-4">
                             <label className="block text-sm font-medium mb-2">
-                                Refresh Interval (minutes)
+                                Image Change Interval
                             </label>
-                            <Input
-                                type="number"
-                                min="1"
-                                value={tempSettings.refreshInterval / 60000} // Convert ms to minutes for display
-                                onChange={(e) =>
-                                    setTempSettings({
-                                        ...tempSettings,
-                                        refreshInterval:
-                                            parseInt(e.target.value) * 60000, // Convert back to ms
-                                    })
-                                }
+                            <NumberSelect
+                                values={[1, 5, 10, 30, 60]}
+                                unit="minute"
+                                selectedValue={intervalMinutes}
+                                min={1}
+                                onValueChange={handleInterValMinutesChange}
                             />
                         </div>
                     )}
+
+                    <div className="mb-4">
+                        <label className="block text-sm font-medium mb-2">
+                            Keep Screen On
+                        </label>
+                        <NumberSelect
+                            values={["Disabled", "Always on", 5, 10, 30]}
+                            unit="minute"
+                            selectedValue={wakeLockValue}
+                            min={1}
+                            onValueChange={handleWakeLockValueChange}
+                        />
+                    </div>
 
                     <div className="flex space-x-2">
                         <Button onClick={handleSave}>Save</Button>
