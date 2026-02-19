@@ -1,10 +1,20 @@
 import { useEffect, useRef } from "react";
 
-const SPEED = 80;
-const PANEL_WIDTH = 280;
-const PANEL_HEIGHT = 140;
+type MovementType = "static" | "interval" | "continuous";
 
-export default function FloatingClock() {
+type Props = {
+    movement?: MovementType;
+    intervalMs?: number; // for "interval" mode
+};
+
+const SPEED = 80;
+const PANEL_WIDTH = 260;
+const PANEL_HEIGHT = 120;
+
+export default function FloatingClock({
+    movement = "continuous",
+    intervalMs = 10000,
+}: Props) {
     const containerRef = useRef<HTMLDivElement>(null);
 
     const hourRef = useRef<HTMLSpanElement>(null);
@@ -17,6 +27,7 @@ export default function FloatingClock() {
     const position = useRef({ x: 100, y: 100 });
     const lastTime = useRef(0);
 
+    // ---------- helpers ----------
     const normalizeVelocity = () => {
         const mag = Math.sqrt(
             velocity.current.vx ** 2 + velocity.current.vy ** 2,
@@ -25,7 +36,23 @@ export default function FloatingClock() {
         velocity.current.vy = (velocity.current.vy / mag) * SPEED;
     };
 
-    // update time without re-render
+    const getRandomPosition = () => {
+        const padding = 20;
+        const maxX = window.innerWidth - PANEL_WIDTH - padding;
+        const maxY = window.innerHeight - PANEL_HEIGHT - padding;
+
+        return {
+            x: Math.random() * maxX + padding,
+            y: Math.random() * maxY + padding,
+        };
+    };
+
+    const applyTransform = (x: number, y: number) => {
+        if (containerRef.current) {
+            containerRef.current.style.transform = `translate(${x}px, ${y}px)`;
+        }
+    };
+
     const updateTime = () => {
         const now = new Date();
 
@@ -53,64 +80,97 @@ export default function FloatingClock() {
         }
     };
 
+    const getDistance = (
+        a: { x: number; y: number },
+        b: { x: number; y: number },
+    ) => {
+        const dx = a.x - b.x;
+        const dy = a.y - b.y;
+        return Math.sqrt(dx * dx + dy * dy);
+    };
+
+    // ---------- movement ----------
     useEffect(() => {
-        // init velocity
-        velocity.current = {
-            vx: Math.random() * 2 - 1,
-            vy: Math.random() * 2 - 1,
-        };
-        normalizeVelocity();
-
-        lastTime.current = performance.now();
-
-        const animate = (now: number) => {
-            const dt = (now - lastTime.current) / 1000;
-            lastTime.current = now;
-
-            let { x, y } = position.current;
-
-            x += velocity.current.vx * dt;
-            y += velocity.current.vy * dt;
-
-            const maxX = window.innerWidth - PANEL_WIDTH + 10;
-            const maxY = window.innerHeight - PANEL_HEIGHT;
-
-            if (x <= 0) {
-                x = 0;
-                velocity.current.vx *= -1;
-            } else if (x >= maxX) {
-                x = maxX;
-                velocity.current.vx *= -1;
-            }
-
-            if (y <= 0) {
-                y = 0;
-                velocity.current.vy *= -1;
-            } else if (y >= maxY) {
-                y = maxY;
-                velocity.current.vy *= -1;
-            }
-
-            position.current = { x, y };
-
-            if (containerRef.current) {
-                containerRef.current.style.transform = `translate(${x}px, ${y}px)`;
-            }
-
-            requestAnimationFrame(animate);
-        };
-
-        const raf = requestAnimationFrame(animate);
-
-        // time updater (1/sec, no re-render)
         updateTime();
-        const interval = setInterval(updateTime, 1000);
+        const timer = setInterval(updateTime, 1000);
+
+        let rafId: number;
+        let intervalId: number | undefined;
+
+        // STATIC
+        if (movement === "static") {
+            applyTransform(position.current.x, position.current.y);
+        }
+
+        // INTERVAL JUMP
+        if (movement === "interval") {
+            const move = () => {
+                const current = position.current;
+                const next = getRandomPosition();
+
+                const distance = getDistance(current, next);
+                const duration = distance / 120; // seconds
+
+                position.current = next;
+
+                if (containerRef.current) {
+                    containerRef.current.style.transition = `transform ${duration}s ease-in-out`;
+                }
+
+                applyTransform(next.x, next.y);
+            };
+
+            move();
+            intervalId = setInterval(move, intervalMs);
+        }
+
+        // CONTINUOUS (DVD bounce)
+        if (movement === "continuous") {
+            velocity.current = {
+                vx: Math.random() * 2 - 1,
+                vy: Math.random() * 2 - 1,
+            };
+            normalizeVelocity();
+
+            lastTime.current = performance.now();
+
+            const animate = (now: number) => {
+                const dt = (now - lastTime.current) / 1000;
+                lastTime.current = now;
+
+                let { x, y } = position.current;
+
+                x += velocity.current.vx * dt;
+                y += velocity.current.vy * dt;
+
+                const maxX = window.innerWidth - PANEL_WIDTH;
+                const maxY = window.innerHeight - PANEL_HEIGHT;
+
+                if (x <= 0 || x >= maxX) {
+                    velocity.current.vx *= -1;
+                    x = Math.max(0, Math.min(x, maxX));
+                }
+
+                if (y <= 0 || y >= maxY) {
+                    velocity.current.vy *= -1;
+                    y = Math.max(0, Math.min(y, maxY));
+                }
+
+                position.current = { x, y };
+                applyTransform(x, y);
+
+                rafId = requestAnimationFrame(animate);
+            };
+
+            rafId = requestAnimationFrame(animate);
+        }
 
         return () => {
-            cancelAnimationFrame(raf);
-            clearInterval(interval);
+            clearInterval(timer);
+            if (intervalId) clearInterval(intervalId);
+            if (rafId) cancelAnimationFrame(rafId);
         };
-    }, []);
+    }, [movement, intervalMs]);
 
     return (
         <div ref={containerRef} className="fixed">
@@ -119,22 +179,14 @@ export default function FloatingClock() {
             >
                 {/* Time */}
                 <div className="flex items-end justify-center gap-1">
-                    <span
-                        ref={hourRef}
-                        className="text-5xl md:text-6xl font-semibold tracking-tight"
-                    >
+                    <span ref={hourRef} className="text-5xl font-semibold">
                         00
                     </span>
-                    <span className="text-5xl md:text-6xl tracking-tight">
-                        :
-                    </span>
-                    <span
-                        ref={minuteRef}
-                        className="text-5xl md:text-6xl font-semibold tracking-tight"
-                    >
+                    <span className="text-5xl">:</span>
+                    <span ref={minuteRef} className="text-5xl font-semibold">
                         00
                     </span>
-                    <div className="flex flex-col items-start leading-none mb-1 ml-1">
+                    <div className="flex flex-col items-start leading-none ml-1 mb-1">
                         <span ref={ampmRef} className="text-[10px] opacity-70">
                             AM
                         </span>
@@ -145,7 +197,7 @@ export default function FloatingClock() {
                 </div>
 
                 {/* Date */}
-                <div ref={dateRef} className="text-md mt-2 opacity-80">
+                <div ref={dateRef} className="text-sm mt-2 opacity-80">
                     Loading...
                 </div>
             </div>

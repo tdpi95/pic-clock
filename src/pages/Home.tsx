@@ -172,7 +172,7 @@ function Home() {
                 />
             )}
 
-            <FloatingClock />
+            <FloatingClock movement="continuous" />
 
             {showSettings && (
                 <WallpaperSettings onBack={() => setShowSettings(false)} />
