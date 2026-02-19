@@ -81,7 +81,6 @@ export const useWakeLock = (initDuration: number) => {
         if (timerRef.current) clearTimeout(timerRef.current);
 
         timerRef.current = setTimeout(() => {
-            toast("Releasing wake lock...");
             releaseLock();
         }, duration);
 

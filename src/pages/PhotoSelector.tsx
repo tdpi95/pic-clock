@@ -6,6 +6,13 @@ import { useEffect, useRef, useState } from "react";
 import ImageURLForm from "./ImageURLForm";
 import { useSettings } from "@/context/SettingsContext";
 import { generateUUID } from "@/lib/utils";
+import {
+    Dialog,
+    DialogContent,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog";
 
 const MAX_IMAGES = 60;
 
@@ -116,69 +123,74 @@ export default function PhotoSelector({ onClose }: PhotoSelectorProps) {
     };
 
     return (
-        <div className="min-h-screen w-full flex items-center justify-center">
-            <div className="w-full max-w-4xl p-8 rounded-xl bg-white/20 backdrop-blur-2xl shadow-xl">
-                <div className="px-6 py-2">
-                    <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-4">
-                        {photos.map((photo, index) => (
-                            <div
-                                key={photo.id}
-                                className="relative aspect-square overflow-hidden rounded-xl shadow w-30 h-30 border border-white"
-                            >
-                                <img
-                                    src={photo.thumbUrl}
-                                    alt={`photo-${index}`}
-                                    className="h-full w-full object-cover"
-                                />
-                                <Button
-                                    size="icon"
-                                    variant="destructive"
-                                    className="absolute top-1 right-1 h-7 w-7 rounded-full bg-destructive/70"
-                                    onClick={() => removeImage(photo.id)}
+        <>
+            <Dialog open={true} onOpenChange={onClose}>
+                <DialogContent className="sm:max-w-4xl">
+                    <DialogHeader>
+                        <DialogTitle>Photo Selector</DialogTitle>
+                    </DialogHeader>
+                    <div className="px-6 py-2">
+                        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-4">
+                            {photos.map((photo, index) => (
+                                <div
+                                    key={photo.id}
+                                    className="relative aspect-square overflow-hidden rounded-xl shadow w-30 h-30 border border-white"
                                 >
-                                    <FiX className="h-4 w-4" />
-                                </Button>
-                            </div>
-                        ))}
+                                    <img
+                                        src={photo.thumbUrl}
+                                        alt={`photo-${index}`}
+                                        className="h-full w-full object-cover"
+                                    />
+                                    <Button
+                                        size="icon"
+                                        variant="destructive"
+                                        className="absolute top-1 right-1 h-7 w-7 rounded-full bg-destructive/70"
+                                        onClick={() => removeImage(photo.id)}
+                                    >
+                                        <FiX className="h-4 w-4" />
+                                    </Button>
+                                </div>
+                            ))}
 
-                        {photos.length < MAX_IMAGES && (
-                            <div className="relative w-30 flex flex-col aspect-square items-center justify-center rounded-xl border border-white bg-white/50 text-muted-foreground shadow-md">
-                                <button
-                                    type="button"
-                                    onClick={() => handleAddClick(mode)}
-                                    className="rounded-md hover:bg-white/90"
-                                >
-                                    <FiPlus className="h-10 w-10" />
-                                </button>
-                                <IconToggle
-                                    className="absolute bottom-1"
-                                    enabled={mode === "url"}
-                                    onChange={(s) => {
-                                        const newMode = s ? "url" : "file";
-                                        setMode(newMode);
-                                        updateSettings({ uploadMode: newMode });
-                                    }}
-                                    leftIcon={<FiUpload />}
-                                    rightIcon={<FiLink />}
-                                    height={26}
-                                />
-                            </div>
-                        )}
+                            {photos.length < MAX_IMAGES && (
+                                <div className="relative w-30 flex flex-col aspect-square items-center justify-center rounded-xl border border-white bg-white/50 text-muted-foreground shadow-md">
+                                    <button
+                                        type="button"
+                                        onClick={() => handleAddClick(mode)}
+                                        className="rounded-md hover:bg-white/90"
+                                    >
+                                        <FiPlus className="h-10 w-10" />
+                                    </button>
+                                    <IconToggle
+                                        className="absolute bottom-1"
+                                        enabled={mode === "url"}
+                                        onChange={(s) => {
+                                            const newMode = s ? "url" : "file";
+                                            setMode(newMode);
+                                            updateSettings({
+                                                uploadMode: newMode,
+                                            });
+                                        }}
+                                        leftIcon={<FiUpload />}
+                                        rightIcon={<FiLink />}
+                                        height={26}
+                                    />
+                                </div>
+                            )}
+                        </div>
                     </div>
-
-                    <div className="mt-8 flex justify-center">
+                    <DialogFooter>
                         <Button
                             type="button"
                             variant="default"
-                            className="rounded-full px-8"
+                            className="px-8"
                             onClick={onClose}
                         >
                             OK
                         </Button>
-                    </div>
-                </div>
-            </div>
-
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
             {showUrlForm && (
                 <ImageURLForm
                     onClose={() => setShowUrlForm(false)}
@@ -195,6 +207,6 @@ export default function PhotoSelector({ onClose }: PhotoSelectorProps) {
                 className="hidden"
                 onChange={handleFilesSelected}
             />
-        </div>
+        </>
     );
 }

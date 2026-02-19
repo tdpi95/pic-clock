@@ -1,7 +1,14 @@
 import { Button } from "@/components/ui/button";
+import {
+    Dialog,
+    DialogContent,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
-import { LuPlus, LuTrash, LuX } from "react-icons/lu";
+import { LuPlus, LuTrash } from "react-icons/lu";
 
 interface ImageURLFormProps {
     onClose?: () => void;
@@ -60,20 +67,11 @@ export default function ImageURLForm({
     };
 
     return (
-        <div className="absolute min-h-screen w-full flex items-center justify-center bg-black/50">
-            <div className="p-6 w-md bg-white/30 dark:bg-gray-800/25 rounded-lg shadow-lg backdrop-blur-lg">
-                <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={onClose}
-                    className="absolute top-2 right-2 h-8 w-8 rounded-full"
-                >
-                    <LuX className="w-4 h-4" />
-                    <span className="sr-only">Close</span>
-                </Button>
-                <h3 className="text-lg font-semibold leading-none tracking-tight">
-                    Image URLs
-                </h3>
+        <Dialog open={true} onOpenChange={onClose}>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>Image URLs</DialogTitle>
+                </DialogHeader>
 
                 <div className="space-y-3 mt-4">
                     {urls.map((url, index) => (
@@ -116,15 +114,17 @@ export default function ImageURLForm({
                     </div>
                 </div>
 
-                <Button
-                    variant="default"
-                    size="sm"
-                    onClick={() => save(urls)}
-                    className="mt-5"
-                >
-                    Save
-                </Button>
-            </div>
-        </div>
+                <DialogFooter>
+                    <Button
+                        variant="default"
+                        size="sm"
+                        onClick={() => save(urls)}
+                        className="mt-5"
+                    >
+                        Save
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
     );
 }

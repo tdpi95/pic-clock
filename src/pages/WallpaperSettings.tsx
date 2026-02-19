@@ -4,8 +4,14 @@ import { Button } from "../components/ui/button";
 import { RadioGroup, RadioGroupItem } from "../components/ui/radio-group";
 import PhotoSelector from "./PhotoSelector";
 import { LuImageUp } from "react-icons/lu";
-import ImageURLForm from "./ImageURLForm";
 import { NumberSelect } from "@/components/NumberSelect";
+import {
+    Dialog,
+    DialogContent,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog";
 
 const WallpaperSettings: React.FC<{ onBack: () => void }> = ({ onBack }) => {
     const { settings, updateSettings } = useSettings();
@@ -60,21 +66,25 @@ const WallpaperSettings: React.FC<{ onBack: () => void }> = ({ onBack }) => {
     };
 
     return (
-        <div className="absolute min-h-screen w-full flex items-center justify-center bg-black/30">
-            {showedPanel === "main" && (
-                <div className="p-6 w-md bg-white/30 dark:bg-gray-800/25 rounded-lg shadow-lg backdrop-blur-lg">
-                    <h2 className="text-xl font-bold mb-4">
-                        Wallpaper Settings
-                    </h2>
-
-                    <div className="mb-4">
+        <div className="absolute min-h-screen w-full flex items-center justify-center">
+            <Dialog
+                open={showedPanel === "main"}
+                onOpenChange={() => {
+                    onBack();
+                }}
+            >
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Wallpaper Settings</DialogTitle>
+                    </DialogHeader>
+                    <div className="mt-2">
                         <label className="block text-sm font-medium mb-2">
-                            Image Source
+                            Image source
                         </label>
                         <RadioGroup
                             value={tempSettings.imageSource}
                             onValueChange={(
-                                value: "picsum" | "bing" | "custom" | "local",
+                                value: "picsum" | "bing" | "local",
                             ) => {
                                 setTempSettings({
                                     ...tempSettings,
@@ -84,7 +94,9 @@ const WallpaperSettings: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                         >
                             <div className="flex items-center space-x-2">
                                 <RadioGroupItem value="picsum" id="picsum" />
-                                <label htmlFor="picsum">Picsum Photos</label>
+                                <label htmlFor="picsum">
+                                    Picsum (random photos)
+                                </label>
                             </div>
                             <div className="flex items-center space-x-2">
                                 <RadioGroupItem value="bing" id="bing" />
@@ -94,7 +106,7 @@ const WallpaperSettings: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                             </div>
                             <div className="flex items-center space-x-2">
                                 <RadioGroupItem value="local" id="local" />
-                                <label htmlFor="local">Local Photos</label>
+                                <label htmlFor="local">Local photos</label>
                                 <LuImageUp
                                     onClick={() =>
                                         setShowedPanel("photoSelector")
@@ -106,9 +118,9 @@ const WallpaperSettings: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                     </div>
 
                     {tempSettings.imageSource !== "bing" && (
-                        <div className="mb-4">
+                        <div>
                             <label className="block text-sm font-medium mb-2">
-                                Image Change Interval
+                                Image change interval
                             </label>
                             <NumberSelect
                                 values={[1, 5, 10, 30, 60]}
@@ -120,9 +132,9 @@ const WallpaperSettings: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                         </div>
                     )}
 
-                    <div className="mb-4">
+                    <div className="mb-2">
                         <label className="block text-sm font-medium mb-2">
-                            Keep Screen On
+                            Keep screen on
                         </label>
                         <NumberSelect
                             values={["Disabled", "Always on", 5, 10, 30]}
@@ -132,22 +144,17 @@ const WallpaperSettings: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                             onValueChange={handleWakeLockValueChange}
                         />
                     </div>
-
-                    <div className="flex space-x-2">
-                        <Button onClick={handleSave}>Save</Button>
+                    <DialogFooter>
                         <Button variant="outline" onClick={onBack}>
                             Cancel
                         </Button>
-                    </div>
-                </div>
-            )}
+                        <Button onClick={handleSave}>Save</Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
 
             {showedPanel === "photoSelector" && (
                 <PhotoSelector onClose={() => setShowedPanel("main")} />
-            )}
-
-            {showedPanel === "imageURLForm" && (
-                <ImageURLForm onClose={() => setShowedPanel("main")} />
             )}
         </div>
     );
