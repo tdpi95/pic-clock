@@ -1,16 +1,34 @@
 import { createContext, useContext, useEffect, useState } from "react";
 
+interface Position {
+    x: number;
+    y: number;
+}
+
+export type MovementType = "static" | "interval" | "continuous";
+
+export interface ClockSettings {
+    movement: MovementType;
+    moveInterval: number; // for interval mode
+    position: Position; // for static mode
+    color1: string;
+    color2: string;
+    font: string;
+    bgOpacity: number;
+}
+
 interface Settings {
     imageSource: string;
     imageChangeInterval: number;
     uploadMode: "file" | "url";
     wakeLockDuration: number;
-    initialized?: boolean;
+    clockSettings?: ClockSettings;
 }
 
 interface SettingsContextType {
     settings: Settings;
     updateSettings: (newSettings: Partial<Settings>) => void;
+    isInitialized: boolean;
 }
 
 const SettingsContext = createContext<SettingsContextType | undefined>(
@@ -21,15 +39,23 @@ const defaultSettings: Settings = {
     imageSource: "picsum",
     imageChangeInterval: 300000, // 5 minutes
     uploadMode: "file",
-    wakeLockDuration: 300000, // 5 minutes
-    initialized: false,
+    wakeLockDuration: -1, // disabled by default
+    clockSettings: {
+        movement: "continuous",
+        moveInterval: 10000,
+        position: { x: 100, y: 100 },
+        color1: "#ffffff",
+        color2: "#000000",
+        font: "Arial",
+        bgOpacity: 20,
+    },
 };
 
 export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({
     children,
 }) => {
     const [settings, setSettings] = useState<Settings>(defaultSettings);
-    const [isLoading, setLoading] = useState(true);
+    const [isInitialized, setInitialized] = useState(false);
 
     useEffect(() => {
         const stored = localStorage.getItem("picClockSettings");
@@ -45,12 +71,11 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({
                 );
             }
         }
-        setLoading(false);
+        setInitialized(true);
     }, []);
 
     useEffect(() => {
-        if (isLoading) return;
-        settings.initialized = true;
+        if (!isInitialized) return;
         console.log("Saving settings to localStorage:", settings);
         localStorage.setItem("picClockSettings", JSON.stringify(settings));
     }, [settings]);
@@ -60,7 +85,9 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({
     };
 
     return (
-        <SettingsContext.Provider value={{ settings, updateSettings }}>
+        <SettingsContext.Provider
+            value={{ settings, updateSettings, isInitialized }}
+        >
             {children}
         </SettingsContext.Provider>
     );

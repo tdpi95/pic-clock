@@ -8,7 +8,7 @@ type Props = {
 };
 
 const SPEED = 80;
-const PANEL_WIDTH = 260;
+const PANEL_WIDTH = 280;
 const PANEL_HEIGHT = 120;
 
 export default function FloatingClock({
@@ -147,7 +147,7 @@ export default function FloatingClock({
                 x += velocity.current.vx * dt;
                 y += velocity.current.vy * dt;
 
-                const maxX = window.innerWidth - PANEL_WIDTH;
+                const maxX = window.innerWidth - PANEL_WIDTH + 32; // don't know why it doesn't reach the edge without extra 32px
                 const maxY = window.innerHeight - PANEL_HEIGHT;
 
                 if (x <= 0 || x >= maxX) {
@@ -201,7 +201,7 @@ export default function FloatingClock({
                 </div>
 
                 {/* Date */}
-                <div ref={dateRef} className="text-sm mt-2 opacity-80">
+                <div ref={dateRef} className="text-md mt-2 opacity-80">
                     Loading...
                 </div>
             </div>

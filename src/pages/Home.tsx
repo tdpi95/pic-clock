@@ -1,13 +1,14 @@
 import { useSettings } from "@/context/SettingsContext";
 import { useCallback, useEffect, useRef, useState } from "react";
 import WallpaperSettings from "./WallpaperSettings";
-import { LuFullscreen, LuImage } from "react-icons/lu";
+import { LuClock, LuFullscreen, LuImage } from "react-icons/lu";
 import { Button } from "@/components/ui/button";
 import { useImageStore } from "@/hooks/useImageStore";
 import Footer from "@/components/Footer";
 import { useWakeLock } from "@/hooks/useWakeLock";
 import { Toaster } from "sonner";
 import FloatingClock from "@/components/FloatingClock";
+import ClockSettings from "./ClockSettings";
 
 const proxy = "https://whateverorigin.org/get?url=";
 const bingUrl = encodeURIComponent(
@@ -36,9 +37,10 @@ const getBingImageUrl = async () => {
 };
 
 function Home() {
-    const { settings } = useSettings();
+    const { settings, isInitialized } = useSettings();
     const [showSettings, setShowSettings] = useState(false);
-    const { changeDuration } = useWakeLock(-1);
+    const [showClockSettings, setShowClockSettings] = useState(false);
+    const { changeDuration: changeWakeLockDuration } = useWakeLock(-1);
 
     const imgRef = useRef<HTMLImageElement | null>(null);
     const containerRef = useRef<HTMLDivElement | null>(null);
@@ -81,11 +83,13 @@ function Home() {
     };
 
     useEffect(() => {
-        changeDuration(settings.wakeLockDuration);
-    }, [changeDuration, settings.wakeLockDuration]);
+        if (isInitialized) {
+            changeWakeLockDuration(settings.wakeLockDuration);
+        }
+    }, [changeWakeLockDuration, isInitialized, settings.wakeLockDuration]);
 
     useEffect(() => {
-        if (!settings.initialized) return;
+        if (!isInitialized) return;
 
         let refreshMillis = 0;
         switch (settings.imageSource) {
@@ -112,14 +116,18 @@ function Home() {
             setPhotoKeys(keys);
         };
 
-        if (settings.initialized) {
+        const init = isInitialized;
+
+        if (init) {
             if (settings.imageSource === "local") {
                 loadPhotoKeys();
             } else {
                 handleNext();
             }
         }
-    }, [settings.imageSource, settings.initialized, photoStore]);
+        // dependency should be whole settings instead of just imageSource,
+        // otherwise if image source is the same as default, the effect won't run and no image will be loaded
+    }, [settings, photoStore]);
 
     useEffect(() => {
         if (photoKeys.length > 0) {
@@ -178,12 +186,24 @@ function Home() {
                 <WallpaperSettings onBack={() => setShowSettings(false)} />
             )}
 
+            <ClockSettings
+                visible={showClockSettings}
+                onClose={() => setShowClockSettings(false)}
+            />
+
             <Toaster />
 
             <Footer
                 triggerElementRef={imgRef}
                 rightElement={
                     <div className="flex gap-2">
+                        <Button
+                            size="lg"
+                            variant="ghost"
+                            onClick={() => setShowClockSettings((v) => !v)}
+                        >
+                            <LuClock size={30} />
+                        </Button>
                         <Button
                             size="lg"
                             variant="ghost"

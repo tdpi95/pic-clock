@@ -66,7 +66,7 @@ const WallpaperSettings: React.FC<{ onBack: () => void }> = ({ onBack }) => {
     };
 
     return (
-        <div className="absolute min-h-screen w-full flex items-center justify-center">
+        <>
             <Dialog
                 open={showedPanel === "main"}
                 onOpenChange={() => {
@@ -156,7 +156,7 @@ const WallpaperSettings: React.FC<{ onBack: () => void }> = ({ onBack }) => {
             {showedPanel === "photoSelector" && (
                 <PhotoSelector onClose={() => setShowedPanel("main")} />
             )}
-        </div>
+        </>
     );
 };
 

@@ -29,7 +29,9 @@ export const useWakeLock = (initDuration: number) => {
                     setIsActive(false);
                     wakeLockRef.current = null;
                     console.log("Screen wake lock was released");
-                    toast.success("Screen wake lock was released");
+                    toast.success("Screen wake lock was released", {
+                        position: "bottom-left",
+                    });
                 });
 
                 wakeLockRef.current = sentinel;
@@ -37,7 +39,7 @@ export const useWakeLock = (initDuration: number) => {
                 const msg =
                     "Screen wake lock is active for " + duration / 1000 + "s";
                 console.log(msg);
-                toast.success(msg);
+                toast.success(msg, { position: "bottom-left" });
             } catch (err: unknown) {
                 if (err instanceof Error) {
                     console.error(`${err.name}, ${err.message}`);
@@ -47,7 +49,7 @@ export const useWakeLock = (initDuration: number) => {
             console.error("Wake Lock API not supported in this browser");
             if (!showedErrorRef.current) {
                 toast.error("Wake lock API is not supported in this browser", {
-                    position: "top-left",
+                    position: "bottom-left",
                 });
                 showedErrorRef.current = true;
             }
