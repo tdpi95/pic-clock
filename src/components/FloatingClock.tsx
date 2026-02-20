@@ -126,6 +126,10 @@ export default function FloatingClock({
 
         // CONTINUOUS (DVD bounce)
         if (movement === "continuous") {
+            if (containerRef.current) {
+                containerRef.current.style.transition = "none";
+            }
+
             velocity.current = {
                 vx: Math.random() * 2 - 1,
                 vy: Math.random() * 2 - 1,

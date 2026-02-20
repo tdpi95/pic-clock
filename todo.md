@@ -16,4 +16,6 @@
 
 ## Issues
 
-- [ ] Wake lock release doesn't work on iPadOS
+- [ ] Wake lock release doesn't work
+- [ ] Release and request new wake lock when duration change
+- [ ] Dialogs don't show up when in fullscreen

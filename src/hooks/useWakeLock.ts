@@ -16,33 +16,28 @@ export const useWakeLock = (initDuration: number) => {
     const requestLock = useCallback(async () => {
         if (duration < 0) return; // don't request if disabled
 
-        // console.log("navigator:", navigator);
-
-        // const navObj: Record<string, unknown> = {};
-        // for (const key in navigator) {
-        //     const value = navigator[key as keyof Navigator];
-
-        //     if (typeof value !== "function") {
-        //         navObj[key] = value;
-        //     }
-        // }
+        if (wakeLockRef.current !== null && !wakeLockRef.current.released) {
+            console.log("Wake Lock already active. Skipping request.");
+            return;
+        }
 
         if ("wakeLock" in navigator) {
             try {
-                wakeLockRef.current =
-                    await navigator.wakeLock.request("screen");
-                setIsActive(true);
-                console.log(
-                    "Screen wake lock is active for " + duration + " ms",
-                );
+                const sentinel = await navigator.wakeLock.request("screen");
 
-                wakeLockRef.current.addEventListener("release", () => {
+                sentinel.addEventListener("release", () => {
                     setIsActive(false);
+                    wakeLockRef.current = null;
                     console.log("Screen wake lock was released");
-                    toast.success("Screen wake lock was released", {
-                        position: "top-left",
-                    });
+                    toast.success("Screen wake lock was released");
                 });
+
+                wakeLockRef.current = sentinel;
+                setIsActive(true);
+                const msg =
+                    "Screen wake lock is active for " + duration / 1000 + "s";
+                console.log(msg);
+                toast.success(msg);
             } catch (err: unknown) {
                 if (err instanceof Error) {
                     console.error(`${err.name}, ${err.message}`);
@@ -71,7 +66,6 @@ export const useWakeLock = (initDuration: number) => {
                 }
                 console.error("Error releasing wake lock:", err);
             }
-            wakeLockRef.current = null;
         }
     };
 
@@ -83,8 +77,6 @@ export const useWakeLock = (initDuration: number) => {
         timerRef.current = setTimeout(() => {
             releaseLock();
         }, duration);
-
-        console.log("Wake lock timer started");
     }, [duration]);
 
     useEffect(() => {
