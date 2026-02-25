@@ -17,16 +17,22 @@ export interface ClockSettings {
     bgOpacity: number;
 }
 
-interface Settings {
+export interface WallpaperSettings {
     imageSource: string;
     imageChangeInterval: number;
     uploadMode: "file" | "url";
     wakeLockDuration: number;
-    clockSettings?: ClockSettings;
+}
+
+interface Settings {
+    wallpaper: WallpaperSettings;
+    clock: ClockSettings;
 }
 
 interface SettingsContextType {
     settings: Settings;
+    wallpaperSettings: WallpaperSettings;
+    clockSettings: ClockSettings;
     updateSettings: (newSettings: Partial<Settings>) => void;
     isInitialized: boolean;
 }
@@ -36,11 +42,13 @@ const SettingsContext = createContext<SettingsContextType | undefined>(
 );
 
 const defaultSettings: Settings = {
-    imageSource: "picsum",
-    imageChangeInterval: 300000, // 5 minutes
-    uploadMode: "file",
-    wakeLockDuration: -1, // disabled by default
-    clockSettings: {
+    wallpaper: {
+        imageSource: "picsum",
+        imageChangeInterval: 300000, // 5 minutes
+        uploadMode: "file",
+        wakeLockDuration: -1, // disabled by default
+    },
+    clock: {
         movement: "continuous",
         moveInterval: 10000,
         position: { x: 100, y: 100 },
@@ -55,6 +63,11 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({
     children,
 }) => {
     const [settings, setSettings] = useState<Settings>(defaultSettings);
+    const [wallpaperSettings, setWallpaperSettings] =
+        useState<WallpaperSettings>(defaultSettings.wallpaper);
+    const [clockSettings, setClockSettings] = useState<ClockSettings>(
+        defaultSettings.clock,
+    );
     const [isInitialized, setInitialized] = useState(false);
 
     useEffect(() => {
@@ -75,10 +88,14 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({
     }, []);
 
     useEffect(() => {
+        setWallpaperSettings(settings.wallpaper);
+        setClockSettings(settings.clock);
+
         if (!isInitialized) return;
+
         console.log("Saving settings to localStorage:", settings);
         localStorage.setItem("picClockSettings", JSON.stringify(settings));
-    }, [settings]);
+    }, [settings, isInitialized]);
 
     const updateSettings = (newSettings: Partial<Settings>) => {
         setSettings((prev) => ({ ...prev, ...newSettings }));
@@ -86,7 +103,13 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({
 
     return (
         <SettingsContext.Provider
-            value={{ settings, updateSettings, isInitialized }}
+            value={{
+                settings,
+                wallpaperSettings,
+                clockSettings,
+                updateSettings,
+                isInitialized,
+            }}
         >
             {children}
         </SettingsContext.Provider>

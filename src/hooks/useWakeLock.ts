@@ -14,10 +14,11 @@ export const useWakeLock = (initDuration: number) => {
     const showedErrorRef = useRef(false);
 
     const requestLock = useCallback(async () => {
-        if (duration < 0) return; // don't request if disabled
-
         if (wakeLockRef.current !== null && !wakeLockRef.current.released) {
-            console.log("Wake Lock already active. Skipping request.");
+            releaseLock();
+        }
+
+        if (isNaN(duration) || duration < 0) {
             return;
         }
 
@@ -82,7 +83,7 @@ export const useWakeLock = (initDuration: number) => {
     }, [duration]);
 
     useEffect(() => {
-        if (duration < 0) return;
+        if (isNaN(duration) || duration < 0) return;
 
         const handleVisibilityChange = async () => {
             if (
@@ -95,7 +96,10 @@ export const useWakeLock = (initDuration: number) => {
         };
 
         const handleClick = async () => {
-            await requestLock();
+            if (wakeLockRef.current == null || wakeLockRef.current.released) {
+                await requestLock();
+            }
+
             startTimer();
         };
 

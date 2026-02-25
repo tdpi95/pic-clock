@@ -1,14 +1,13 @@
 import { useSettings } from "@/context/SettingsContext";
 import { useCallback, useEffect, useRef, useState } from "react";
 import WallpaperSettings from "./WallpaperSettings";
-import { LuClock, LuFullscreen, LuImage } from "react-icons/lu";
+import { LuFullscreen, LuSettings } from "react-icons/lu";
 import { Button } from "@/components/ui/button";
 import { useImageStore } from "@/hooks/useImageStore";
 import Footer from "@/components/Footer";
 import { useWakeLock } from "@/hooks/useWakeLock";
 import { Toaster } from "sonner";
 import FloatingClock from "@/components/FloatingClock";
-import ClockSettings from "./ClockSettings";
 
 const proxy = "https://whateverorigin.org/get?url=";
 const bingUrl = encodeURIComponent(
@@ -37,9 +36,8 @@ const getBingImageUrl = async () => {
 };
 
 function Home() {
-    const { settings, isInitialized } = useSettings();
+    const { wallpaperSettings, clockSettings, isInitialized } = useSettings();
     const [showSettings, setShowSettings] = useState(false);
-    const [showClockSettings, setShowClockSettings] = useState(false);
     const { changeDuration: changeWakeLockDuration } = useWakeLock(-1);
 
     const imgRef = useRef<HTMLImageElement | null>(null);
@@ -54,7 +52,7 @@ function Home() {
     const [listIdx, setListIdx] = useState(0);
 
     const getNextUrl = useCallback(async () => {
-        if (settings.imageSource === "local") {
+        if (wallpaperSettings.imageSource === "local") {
             if (photoKeys.length === 0) return null;
 
             const nextIdx = (listIdx + 1) % photoKeys.length;
@@ -62,13 +60,13 @@ function Home() {
             setListIdx(nextIdx);
             console.log("Loading local image:", url);
             return url;
-        } else if (settings.imageSource === "picsum") {
+        } else if (wallpaperSettings.imageSource === "picsum") {
             return getPicsumImageUrl();
-        } else if (settings.imageSource === "bing") {
+        } else if (wallpaperSettings.imageSource === "bing") {
             return getBingImageUrl();
         }
         return null;
-    }, [settings.imageSource, photoKeys, listIdx, photoStore]);
+    }, [wallpaperSettings.imageSource, photoKeys, listIdx, photoStore]);
 
     const handleNext = useCallback(() => {
         getNextUrl().then((url) => {
@@ -84,18 +82,22 @@ function Home() {
 
     useEffect(() => {
         if (isInitialized) {
-            changeWakeLockDuration(settings.wakeLockDuration);
+            changeWakeLockDuration(wallpaperSettings.wakeLockDuration);
         }
-    }, [changeWakeLockDuration, isInitialized, settings.wakeLockDuration]);
+    }, [
+        changeWakeLockDuration,
+        isInitialized,
+        wallpaperSettings.wakeLockDuration,
+    ]);
 
     useEffect(() => {
         if (!isInitialized) return;
 
         let refreshMillis = 0;
-        switch (settings.imageSource) {
+        switch (wallpaperSettings.imageSource) {
             case "picsum":
             case "local":
-                refreshMillis = settings.imageChangeInterval;
+                refreshMillis = wallpaperSettings.imageChangeInterval;
                 break;
             case "bing":
                 refreshMillis = 60 * 60 * 1000; // 1 hour
@@ -107,10 +109,10 @@ function Home() {
         const interval = setInterval(handleNext, refreshMillis);
 
         return () => clearInterval(interval);
-    }, [settings, handleNext]);
+    }, [wallpaperSettings, handleNext]);
 
     useEffect(() => {
-        console.log("image source changed:", settings.imageSource);
+        console.log("image source changed:", wallpaperSettings.imageSource);
         const loadPhotoKeys = async () => {
             const keys = await photoStore.getAllKeys();
             setPhotoKeys(keys);
@@ -119,7 +121,7 @@ function Home() {
         const init = isInitialized;
 
         if (init) {
-            if (settings.imageSource === "local") {
+            if (wallpaperSettings.imageSource === "local") {
                 loadPhotoKeys();
             } else {
                 handleNext();
@@ -127,7 +129,7 @@ function Home() {
         }
         // dependency should be whole settings instead of just imageSource,
         // otherwise if image source is the same as default, the effect won't run and no image will be loaded
-    }, [settings, photoStore]);
+    }, [wallpaperSettings, photoStore]);
 
     useEffect(() => {
         if (photoKeys.length > 0) {
@@ -180,16 +182,14 @@ function Home() {
                 />
             )}
 
-            <FloatingClock movement="continuous" />
+            <FloatingClock
+                movement={clockSettings.movement}
+                moving={!showSettings}
+            />
 
             {showSettings && (
                 <WallpaperSettings onBack={() => setShowSettings(false)} />
             )}
-
-            <ClockSettings
-                visible={showClockSettings}
-                onClose={() => setShowClockSettings(false)}
-            />
 
             <Toaster />
 
@@ -200,16 +200,9 @@ function Home() {
                         <Button
                             size="lg"
                             variant="ghost"
-                            onClick={() => setShowClockSettings((v) => !v)}
-                        >
-                            <LuClock size={30} />
-                        </Button>
-                        <Button
-                            size="lg"
-                            variant="ghost"
                             onClick={() => setShowSettings((v) => !v)}
                         >
-                            <LuImage size={30} />
+                            <LuSettings size={30} />
                         </Button>
                         <Button
                             size="lg"

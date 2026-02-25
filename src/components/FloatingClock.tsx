@@ -5,6 +5,7 @@ type MovementType = "static" | "interval" | "continuous";
 type Props = {
     movement?: MovementType;
     intervalMs?: number; // for "interval" mode
+    moving?: boolean;
 };
 
 const SPEED = 80;
@@ -14,6 +15,7 @@ const PANEL_HEIGHT = 120;
 export default function FloatingClock({
     movement = "continuous",
     intervalMs = 10000,
+    moving = true,
 }: Props) {
     const containerRef = useRef<HTMLDivElement>(null);
 
@@ -94,6 +96,10 @@ export default function FloatingClock({
         updateTime();
         const timer = setInterval(updateTime, 1000);
 
+        if (!moving) {
+            return () => clearInterval(timer);
+        }
+
         let rafId: number;
         let intervalId: number | undefined;
 
@@ -147,8 +153,8 @@ export default function FloatingClock({
                 x += velocity.current.vx * dt;
                 y += velocity.current.vy * dt;
 
-                const maxX = window.innerWidth - PANEL_WIDTH + 32; // don't know why it doesn't reach the edge without extra 32px
-                const maxY = window.innerHeight - PANEL_HEIGHT;
+                const maxX = window.innerWidth - PANEL_WIDTH;
+                const maxY = window.innerHeight - PANEL_HEIGHT - 8;
 
                 if (x <= 0 || x >= maxX) {
                     velocity.current.vx *= -1;
@@ -174,7 +180,7 @@ export default function FloatingClock({
             if (intervalId) clearInterval(intervalId);
             if (rafId) cancelAnimationFrame(rafId);
         };
-    }, [movement, intervalMs]);
+    }, [movement, intervalMs, moving]);
 
     return (
         <div ref={containerRef} className="fixed">

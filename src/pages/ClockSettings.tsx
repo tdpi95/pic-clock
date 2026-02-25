@@ -17,15 +17,13 @@ interface ClockSettingsProps {
 
 const ClockSettings = ({ visible, onClose }: ClockSettingsProps) => {
     const { settings, updateSettings } = useSettings();
-    const [tempClockSettings, setTempSettings] = useState(
-        settings.clockSettings,
-    );
+    const [tempClockSettings, setTempSettings] = useState(settings.clock);
 
     const saveSettings = () => {
         if (!tempClockSettings) return;
 
         updateSettings({
-            clockSettings: tempClockSettings,
+            clock: tempClockSettings,
         });
 
         onClose();
@@ -45,7 +43,7 @@ const ClockSettings = ({ visible, onClose }: ClockSettingsProps) => {
             <Dialog open={visible} onOpenChange={(open) => !open && onClose()}>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>Clock Settings</DialogTitle>
+                        <DialogTitle>Clock Customizations</DialogTitle>
                     </DialogHeader>
 
                     <div className="mt-2">

@@ -29,10 +29,10 @@ type Photo = {
 
 export default function PhotoSelector({ onClose }: PhotoSelectorProps) {
     const photoStore = useImageStore("photos");
-    const { settings, updateSettings } = useSettings();
+    const { wallpaperSettings, updateSettings } = useSettings();
     const [photos, setPhotos] = useState<Photo[]>([]);
 
-    const [mode, setMode] = useState<AddMode>(settings.uploadMode);
+    const [mode, setMode] = useState<AddMode>(wallpaperSettings.uploadMode);
     const [showUrlForm, setShowUrlForm] = useState(false);
 
     const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -168,7 +168,10 @@ export default function PhotoSelector({ onClose }: PhotoSelectorProps) {
                                             const newMode = s ? "url" : "file";
                                             setMode(newMode);
                                             updateSettings({
-                                                uploadMode: newMode,
+                                                wallpaper: {
+                                                    ...wallpaperSettings,
+                                                    uploadMode: newMode,
+                                                },
                                             });
                                         }}
                                         leftIcon={<FiUpload />}

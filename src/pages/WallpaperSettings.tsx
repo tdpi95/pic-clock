@@ -12,24 +12,27 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog";
+import ClockSettings from "./ClockSettings";
+
+type PanelType = "main" | "photoSelector" | "clockSettings";
 
 const WallpaperSettings: React.FC<{ onBack: () => void }> = ({ onBack }) => {
     const { settings, updateSettings } = useSettings();
-    const [tempSettings, setTempSettings] = useState(settings);
-    const [showedPanel, setShowedPanel] = useState("main");
+    const [tempSettings, setTempSettings] = useState(settings.wallpaper);
+    const [showedPanel, setShowedPanel] = useState<PanelType>("main");
     const [intervalMinutes, setIntervalMinutes] = useState<number | "">(
-        settings.imageChangeInterval / 60000,
+        settings.wallpaper.imageChangeInterval / 60000,
     );
     const [wakeLockValue, setWakeLockValue] = useState<number | string>(
-        settings.wakeLockDuration === -1
+        settings.wallpaper.wakeLockDuration === -1
             ? "Disabled"
-            : settings.wakeLockDuration === 0
+            : settings.wallpaper.wakeLockDuration === 0
               ? "Always on"
-              : settings.wakeLockDuration / 60000,
+              : settings.wallpaper.wakeLockDuration / 60000,
     );
 
     const handleSave = () => {
-        updateSettings(tempSettings);
+        updateSettings({ wallpaper: tempSettings });
         onBack();
     };
 
@@ -75,8 +78,17 @@ const WallpaperSettings: React.FC<{ onBack: () => void }> = ({ onBack }) => {
             >
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>Wallpaper Settings</DialogTitle>
+                        <DialogTitle>Settings</DialogTitle>
                     </DialogHeader>
+
+                    <Button
+                        variant={"outline-ghost"}
+                        className="mt-4 w-fit"
+                        onClick={() => setShowedPanel("clockSettings")}
+                    >
+                        Clock customizations...
+                    </Button>
+
                     <div className="mt-2">
                         <label className="block text-sm font-medium mb-2">
                             Image source
@@ -152,6 +164,11 @@ const WallpaperSettings: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
+
+            <ClockSettings
+                visible={showedPanel === "clockSettings"}
+                onClose={() => setShowedPanel("main")}
+            />
 
             {showedPanel === "photoSelector" && (
                 <PhotoSelector onClose={() => setShowedPanel("main")} />
