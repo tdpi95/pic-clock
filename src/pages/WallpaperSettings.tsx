@@ -1,40 +1,25 @@
 import React, { useState } from "react";
 import { useSettings } from "../context/SettingsContext";
-import { Button } from "../components/ui/button";
 import { RadioGroup, RadioGroupItem } from "../components/ui/radio-group";
 import PhotoSelector from "./PhotoSelector";
 import { LuImageUp } from "react-icons/lu";
 import { NumberSelect } from "@/components/NumberSelect";
-import {
-    Dialog,
-    DialogContent,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-} from "@/components/ui/dialog";
-import ClockSettings from "./ClockSettings";
 
 type PanelType = "main" | "photoSelector" | "clockSettings";
 
-const WallpaperSettings: React.FC<{ onBack: () => void }> = ({ onBack }) => {
-    const { settings, updateSettings } = useSettings();
-    const [tempSettings, setTempSettings] = useState(settings.wallpaper);
+const WallpaperSettings: React.FC = () => {
+    const { wallpaperSettings, updateSettings } = useSettings();
     const [showedPanel, setShowedPanel] = useState<PanelType>("main");
     const [intervalMinutes, setIntervalMinutes] = useState<number | "">(
-        settings.wallpaper.imageChangeInterval / 60000,
+        wallpaperSettings.imageChangeInterval / 60000,
     );
     const [wakeLockValue, setWakeLockValue] = useState<number | string>(
-        settings.wallpaper.wakeLockDuration === -1
+        wallpaperSettings.wakeLockDuration === -1
             ? "Disabled"
-            : settings.wallpaper.wakeLockDuration === 0
+            : wallpaperSettings.wakeLockDuration === 0
               ? "Always on"
-              : settings.wallpaper.wakeLockDuration / 60000,
+              : wallpaperSettings.wakeLockDuration / 60000,
     );
-
-    const handleSave = () => {
-        updateSettings({ wallpaper: tempSettings });
-        onBack();
-    };
 
     const handleWakeLockValueChange = (value: number | string) => {
         console.log("Wake lock value change:", value);
@@ -51,9 +36,11 @@ const WallpaperSettings: React.FC<{ onBack: () => void }> = ({ onBack }) => {
             return;
         }
 
-        setTempSettings({
-            ...tempSettings,
-            wakeLockDuration: duration,
+        updateSettings({
+            wallpaper: {
+                ...wallpaperSettings,
+                wakeLockDuration: duration,
+            },
         });
     };
 
@@ -62,113 +49,79 @@ const WallpaperSettings: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 
         setIntervalMinutes(value);
 
-        setTempSettings({
-            ...tempSettings,
-            imageChangeInterval: value * 60000,
+        updateSettings({
+            wallpaper: {
+                ...wallpaperSettings,
+                imageChangeInterval: value * 60000,
+            },
+        });
+    };
+
+    const updateImageSource = (value: "picsum" | "bing" | "local") => {
+        updateSettings({
+            wallpaper: {
+                ...wallpaperSettings,
+                imageSource: value,
+            },
         });
     };
 
     return (
         <>
-            <Dialog
-                open={showedPanel === "main"}
-                onOpenChange={() => {
-                    onBack();
-                }}
-            >
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>Settings</DialogTitle>
-                    </DialogHeader>
-
-                    <Button
-                        variant={"outline-ghost"}
-                        className="mt-4 w-fit"
-                        onClick={() => setShowedPanel("clockSettings")}
-                    >
-                        Clock customizations...
-                    </Button>
-
-                    <div className="mt-2">
-                        <label className="block text-sm font-medium mb-2">
-                            Image source
-                        </label>
-                        <RadioGroup
-                            value={tempSettings.imageSource}
-                            onValueChange={(
-                                value: "picsum" | "bing" | "local",
-                            ) => {
-                                setTempSettings({
-                                    ...tempSettings,
-                                    imageSource: value,
-                                });
-                            }}
-                        >
-                            <div className="flex items-center space-x-2">
-                                <RadioGroupItem value="picsum" id="picsum" />
-                                <label htmlFor="picsum">
-                                    Picsum (random photos)
-                                </label>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                                <RadioGroupItem value="bing" id="bing" />
-                                <label htmlFor="bing">
-                                    Bing Image of the Day
-                                </label>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                                <RadioGroupItem value="local" id="local" />
-                                <label htmlFor="local">Local photos</label>
-                                <LuImageUp
-                                    onClick={() =>
-                                        setShowedPanel("photoSelector")
-                                    }
-                                    className="ml-2 cursor-pointer"
-                                />
-                            </div>
-                        </RadioGroup>
+            <div className="mt-2">
+                <label className="block text-sm font-medium mb-2">
+                    Image source
+                </label>
+                <RadioGroup
+                    value={wallpaperSettings.imageSource}
+                    onValueChange={updateImageSource}
+                >
+                    <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="picsum" id="picsum" />
+                        <label htmlFor="picsum">Picsum (random photos)</label>
                     </div>
-
-                    {tempSettings.imageSource !== "bing" && (
-                        <div>
-                            <label className="block text-sm font-medium mb-2">
-                                Image change interval
-                            </label>
-                            <NumberSelect
-                                values={[1, 5, 10, 30, 60]}
-                                unit="minute"
-                                selectedValue={intervalMinutes}
-                                min={1}
-                                onValueChange={handleInterValMinutesChange}
-                            />
-                        </div>
-                    )}
-
-                    <div className="mb-2">
-                        <label className="block text-sm font-medium mb-2">
-                            Keep screen on
-                        </label>
-                        <NumberSelect
-                            values={["Disabled", "Always on", 5, 10, 30]}
-                            unit="minute"
-                            selectedValue={wakeLockValue}
-                            min={1}
-                            onValueChange={handleWakeLockValueChange}
+                    <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="bing" id="bing" />
+                        <label htmlFor="bing">Bing Image of the Day</label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="local" id="local" />
+                        <label htmlFor="local">Local photos</label>
+                        <LuImageUp
+                            onClick={() => setShowedPanel("photoSelector")}
+                            className="ml-2 cursor-pointer"
                         />
                     </div>
-                    <DialogFooter>
-                        <Button variant="outline" onClick={onBack}>
-                            Cancel
-                        </Button>
-                        <Button onClick={handleSave}>Save</Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
+                </RadioGroup>
+            </div>
 
-            <ClockSettings
-                visible={showedPanel === "clockSettings"}
-                onClose={() => setShowedPanel("main")}
-            />
+            {wallpaperSettings.imageSource !== "bing" && (
+                <div>
+                    <label className="block text-sm font-medium mt-4 mb-2">
+                        Image change interval
+                    </label>
+                    <NumberSelect
+                        values={[1, 5, 10, 30, 60]}
+                        unit="minute"
+                        selectedValue={intervalMinutes}
+                        min={1}
+                        onValueChange={handleInterValMinutesChange}
+                    />
+                </div>
+            )}
+
+            <div className="mt-4">
+                <label className="block text-sm font-medium mb-2">
+                    Keep screen on
+                </label>
+                <NumberSelect
+                    values={["Disabled", "Always on", 5, 10, 30]}
+                    unit="minute"
+                    selectedValue={wakeLockValue}
+                    min={1}
+                    onValueChange={handleWakeLockValueChange}
+                />
+            </div>
 
             {showedPanel === "photoSelector" && (
                 <PhotoSelector onClose={() => setShowedPanel("main")} />

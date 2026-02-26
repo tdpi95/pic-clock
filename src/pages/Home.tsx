@@ -1,6 +1,5 @@
 import { useSettings } from "@/context/SettingsContext";
 import { useCallback, useEffect, useRef, useState } from "react";
-import WallpaperSettings from "./WallpaperSettings";
 import { LuFullscreen, LuSettings } from "react-icons/lu";
 import { Button } from "@/components/ui/button";
 import { useImageStore } from "@/hooks/useImageStore";
@@ -8,6 +7,7 @@ import Footer from "@/components/Footer";
 import { useWakeLock } from "@/hooks/useWakeLock";
 import { Toaster } from "sonner";
 import FloatingClock from "@/components/FloatingClock";
+import MainSettings from "./MainSettings";
 
 const proxy = "https://whateverorigin.org/get?url=";
 const bingUrl = encodeURIComponent(
@@ -188,7 +188,7 @@ function Home() {
             />
 
             {showSettings && (
-                <WallpaperSettings onBack={() => setShowSettings(false)} />
+                <MainSettings onBack={() => setShowSettings(false)} />
             )}
 
             <Toaster />
