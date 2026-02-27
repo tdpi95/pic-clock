@@ -2,20 +2,26 @@
 
 ### Wallpaper
 
-- [x] Picsum
-- [x] Bing (proxy quite unreliable)
-- [x] Local photos
 - [x] Fullscreen
-- [ ] Wake lock
+- [x] Wake lock
+- Image sources
+    - [x] Picsum
+    - [x] Bing (proxy quite unreliable)
+    - [x] Local photos
+    - [ ] Immich
+    - [ ] Google Photos
 
 ### Clock
 
-- [ ] Basic clock
+- [x] Basic clock
 - [ ] Clock settings
+    - [x] Movement
+    - [ ] Font
+    - [ ] Colors
 - [ ] Weather
 
 ## Issues
 
-- [ ] Wake lock release doesn't work
-- [ ] Release and request new wake lock when duration change
-- [ ] Dialogs don't show up when in fullscreen
+- [x] Wake lock release doesn't work
+- [x] Release and request new wake lock when duration change
+- [ ] Dialogs don't show up in fullscreen
