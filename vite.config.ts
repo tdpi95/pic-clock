@@ -15,5 +15,5 @@ export default defineConfig({
         outDir: "docs",
         sourcemap: true,
     },
-    base: "/pic-clock/",
+    base: "/picclock/",
 });

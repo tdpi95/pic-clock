@@ -54,3 +54,29 @@ Build:
 ```bash
 npm run build
 ```
+
+## Debugging in VSCode
+
+Create `launch.json` in `.vscode`:
+
+```json
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "chrome",
+            "request": "launch",
+            "name": "Launch Chrome against localhost",
+            "url": "http://localhost:5173/picclock/",
+            "webRoot": "${workspaceFolder}",
+            "userDataDir": "${workspaceFolder}/.vscode/chrome-debug-profile"
+        }
+    ]
+}
+```
+
+### Notes
+
+- `userDataDir` keeps browser data (localStorage, IndexedDB, etc.) persistent between debug sessions
+  → useful for saved settings and local photos
+- If the port or path changes, update the url field
