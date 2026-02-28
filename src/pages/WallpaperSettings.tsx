@@ -4,6 +4,12 @@ import { RadioGroup, RadioGroupItem } from "../components/ui/radio-group";
 import PhotoSelector from "./PhotoSelector";
 import { LuImageUp } from "react-icons/lu";
 import { NumberSelect } from "@/components/NumberSelect";
+import {
+    Field,
+    FieldGroup,
+    FieldLabel,
+    FieldTitle,
+} from "@/components/ui/field";
 
 type PanelType = "main" | "photoSelector" | "clockSettings";
 
@@ -67,66 +73,72 @@ const WallpaperSettings: React.FC = () => {
     };
 
     return (
-        <>
-            <div className="mt-2">
-                <label className="block text-sm font-medium mb-2">
-                    Image source
-                </label>
-                <RadioGroup
-                    value={wallpaperSettings.imageSource}
-                    onValueChange={updateImageSource}
-                >
-                    <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="picsum" id="picsum" />
-                        <label htmlFor="picsum">Picsum (random photos)</label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="bing" id="bing" />
-                        <label htmlFor="bing">Bing Image of the Day</label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="local" id="local" />
-                        <label htmlFor="local">Local photos</label>
-                        <LuImageUp
-                            onClick={() => setShowedPanel("photoSelector")}
-                            className="ml-2 cursor-pointer"
+        <div className="p-4">
+            <FieldGroup>
+                <FieldLabel>
+                    <Field>
+                        <FieldTitle>Photo source</FieldTitle>
+                        <RadioGroup
+                            value={wallpaperSettings.imageSource}
+                            onValueChange={updateImageSource}
+                        >
+                            <div className="flex items-center space-x-2">
+                                <RadioGroupItem value="picsum" id="picsum" />
+                                <label htmlFor="picsum">
+                                    Picsum (random photos)
+                                </label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                                <RadioGroupItem value="bing" id="bing" />
+                                <label htmlFor="bing">
+                                    Bing Image of the Day
+                                </label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                                <RadioGroupItem value="local" id="local" />
+                                <label htmlFor="local">Local photos</label>
+                                <LuImageUp
+                                    onClick={() =>
+                                        setShowedPanel("photoSelector")
+                                    }
+                                    className="ml-2 cursor-pointer"
+                                />
+                            </div>
+                        </RadioGroup>
+                    </Field>
+                </FieldLabel>
+                {wallpaperSettings.imageSource !== "bing" && (
+                    <FieldLabel className="border-primary/60">
+                        <Field orientation={"horizontal"}>
+                            <FieldTitle>Image change interval</FieldTitle>
+                            <NumberSelect
+                                values={[1, 5, 10, 30, 60]}
+                                unit="minute"
+                                selectedValue={intervalMinutes}
+                                min={1}
+                                onValueChange={handleInterValMinutesChange}
+                            />
+                        </Field>
+                    </FieldLabel>
+                )}
+                <FieldLabel className="border-primary/60">
+                    <Field orientation={"horizontal"}>
+                        <FieldTitle>Keep screen on</FieldTitle>
+                        <NumberSelect
+                            values={["Disabled", "Always on", 5, 10, 30]}
+                            unit="minute"
+                            selectedValue={wakeLockValue}
+                            min={1}
+                            onValueChange={handleWakeLockValueChange}
                         />
-                    </div>
-                </RadioGroup>
-            </div>
-
-            {wallpaperSettings.imageSource !== "bing" && (
-                <div>
-                    <label className="block text-sm font-medium mt-4 mb-2">
-                        Image change interval
-                    </label>
-                    <NumberSelect
-                        values={[1, 5, 10, 30, 60]}
-                        unit="minute"
-                        selectedValue={intervalMinutes}
-                        min={1}
-                        onValueChange={handleInterValMinutesChange}
-                    />
-                </div>
-            )}
-
-            <div className="mt-4">
-                <label className="block text-sm font-medium mb-2">
-                    Keep screen on
-                </label>
-                <NumberSelect
-                    values={["Disabled", "Always on", 5, 10, 30]}
-                    unit="minute"
-                    selectedValue={wakeLockValue}
-                    min={1}
-                    onValueChange={handleWakeLockValueChange}
-                />
-            </div>
+                    </Field>
+                </FieldLabel>
+            </FieldGroup>
 
             {showedPanel === "photoSelector" && (
                 <PhotoSelector onClose={() => setShowedPanel("main")} />
             )}
-        </>
+        </div>
     );
 };
 

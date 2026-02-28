@@ -8,6 +8,8 @@ interface Position {
 export type MovementType = "static" | "interval" | "continuous";
 
 export interface ClockSettings {
+    visible: boolean;
+    _24h: boolean;
     movement: MovementType;
     moveInterval: number; // for interval mode
     position: Position; // for static mode
@@ -49,6 +51,8 @@ const defaultSettings: Settings = {
         wakeLockDuration: -1, // disabled by default
     },
     clock: {
+        visible: true,
+        _24h: false,
         movement: "continuous",
         moveInterval: 10000,
         position: { x: 100, y: 100 },

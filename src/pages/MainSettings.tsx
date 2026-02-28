@@ -30,9 +30,7 @@ const MainSettings: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                     </DialogHeader>
                     <Tabs defaultValue="wallpaper" className="w-full">
                         <TabsList className="w-full bg-white/30">
-                            <TabsTrigger value="wallpaper">
-                                Wallpaper
-                            </TabsTrigger>
+                            <TabsTrigger value="wallpaper">Photos</TabsTrigger>
                             <TabsTrigger value="clock">Clock</TabsTrigger>
                         </TabsList>
                         {/* use fixed height "h-[50vh]" if content is too long */}

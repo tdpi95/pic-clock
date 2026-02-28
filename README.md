@@ -80,3 +80,4 @@ Create `launch.json` in `.vscode`:
 - `userDataDir` keeps browser data (localStorage, IndexedDB, etc.) persistent between debug sessions
   → useful for saved settings and local photos
 - If the port or path changes, update the url field
+- Run `npm run dev -- --host` to expose in local network.

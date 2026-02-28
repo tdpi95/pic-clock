@@ -182,10 +182,13 @@ function Home() {
                 />
             )}
 
-            <FloatingClock
-                movement={clockSettings.movement}
-                moving={!showSettings}
-            />
+            {clockSettings.visible && (
+                <FloatingClock
+                    movement={clockSettings.movement}
+                    moving={!showSettings}
+                    _24h={clockSettings._24h}
+                />
+            )}
 
             {showSettings && (
                 <MainSettings onBack={() => setShowSettings(false)} />

@@ -6,16 +6,18 @@ type Props = {
     movement?: MovementType;
     intervalMs?: number; // for "interval" mode
     moving?: boolean;
+    _24h?: boolean;
 };
 
 const SPEED = 80;
-const PANEL_WIDTH = 280;
+const PANEL_WIDTH = 260;
 const PANEL_HEIGHT = 120;
 
 export default function FloatingClock({
     movement = "continuous",
     intervalMs = 10000,
     moving = true,
+    _24h = false,
 }: Props) {
     const containerRef = useRef<HTMLDivElement>(null);
 
@@ -62,7 +64,9 @@ export default function FloatingClock({
         const m = now.getMinutes();
         const s = now.getSeconds();
 
-        const hours = String(h % 12 || 12).padStart(2, "0");
+        const hours = _24h
+            ? String(h).padStart(2, "0")
+            : String(h % 12 || 12).padStart(2, "0");
         const minutes = String(m).padStart(2, "0");
         const seconds = String(s).padStart(2, "0");
         const ampm = h >= 12 ? "PM" : "AM";
@@ -98,6 +102,11 @@ export default function FloatingClock({
 
         if (!moving) {
             return () => clearInterval(timer);
+        }
+
+        let panelWidth = PANEL_WIDTH;
+        if (containerRef.current) {
+            panelWidth = containerRef.current.offsetWidth;
         }
 
         let rafId: number;
@@ -153,7 +162,7 @@ export default function FloatingClock({
                 x += velocity.current.vx * dt;
                 y += velocity.current.vy * dt;
 
-                const maxX = window.innerWidth - PANEL_WIDTH;
+                const maxX = window.innerWidth - panelWidth;
                 const maxY = window.innerHeight - PANEL_HEIGHT - 8;
 
                 if (x <= 0 || x >= maxX) {
@@ -180,15 +189,15 @@ export default function FloatingClock({
             if (intervalId) clearInterval(intervalId);
             if (rafId) cancelAnimationFrame(rafId);
         };
-    }, [movement, intervalMs, moving]);
+    }, [movement, intervalMs, moving, _24h]);
 
     return (
         <div ref={containerRef} className="fixed">
             <div
-                className={`backdrop-blur-xl bg-white/10 border border-white/20 shadow-lg rounded-2xl px-8 py-6 text-center text-white w-[${PANEL_WIDTH}px] h-[${PANEL_HEIGHT}px] flex flex-col justify-center`}
+                className={`backdrop-blur-xl bg-white/10 border border-white/20 shadow-lg rounded-2xl px-8 py-6 text-center text-white  flex flex-col justify-center`}
             >
                 {/* Time */}
-                <div className="flex items-end justify-center gap-1">
+                <div className="flex items-end justify-center gap-1 drop-shadow-[0_1px_1px_rgba(0,0,0,0.2)]">
                     <span ref={hourRef} className="text-5xl font-semibold">
                         00
                     </span>
@@ -196,10 +205,16 @@ export default function FloatingClock({
                     <span ref={minuteRef} className="text-5xl font-semibold">
                         00
                     </span>
-                    <div className="flex flex-col items-start leading-none ml-1 mb-1">
-                        <span ref={ampmRef} className="text-[10px] opacity-70">
-                            AM
-                        </span>
+                    <div className="flex flex-col items-start leading-none ml-0 mb-0">
+                        {!_24h && (
+                            <span
+                                ref={ampmRef}
+                                className="text-[10px] opacity-70"
+                            >
+                                AM
+                            </span>
+                        )}
+
                         <span ref={secondRef} className="text-sm">
                             00
                         </span>
@@ -207,7 +222,10 @@ export default function FloatingClock({
                 </div>
 
                 {/* Date */}
-                <div ref={dateRef} className="text-md mt-2 opacity-80">
+                <div
+                    ref={dateRef}
+                    className="text-md mt-2 opacity-80 drop-shadow-[0_1px_1px_rgba(0,0,0,0.2)]"
+                >
                     Loading...
                 </div>
             </div>
