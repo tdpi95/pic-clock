@@ -194,7 +194,7 @@ export default function FloatingClock({
     return (
         <div ref={containerRef} className="fixed">
             <div
-                className={`backdrop-blur-xl bg-white/10 border border-white/20 shadow-lg rounded-2xl px-8 py-6 text-center text-white  flex flex-col justify-center`}
+                className={`backdrop-blur-md bg-white/10 border border-white/20 shadow-lg rounded-2xl px-8 py-6 text-center text-white  flex flex-col justify-center`}
             >
                 {/* Time */}
                 <div className="flex items-end justify-center gap-1 drop-shadow-[0_1px_1px_rgba(0,0,0,0.2)]">

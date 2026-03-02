@@ -4,12 +4,7 @@ import { RadioGroup, RadioGroupItem } from "../components/ui/radio-group";
 import PhotoSelector from "./PhotoSelector";
 import { LuImageUp } from "react-icons/lu";
 import { NumberSelect } from "@/components/NumberSelect";
-import {
-    Field,
-    FieldGroup,
-    FieldLabel,
-    FieldTitle,
-} from "@/components/ui/field";
+import { Field, FieldGroup, FieldTitle } from "@/components/ui/field";
 
 type PanelType = "main" | "photoSelector" | "clockSettings";
 
@@ -75,40 +70,36 @@ const WallpaperSettings: React.FC = () => {
     return (
         <div className="p-4">
             <FieldGroup>
-                <FieldLabel>
-                    <Field>
-                        <FieldTitle>Photo source</FieldTitle>
-                        <RadioGroup
-                            value={wallpaperSettings.imageSource}
-                            onValueChange={updateImageSource}
-                        >
-                            <div className="flex items-center space-x-2">
-                                <RadioGroupItem value="picsum" id="picsum" />
-                                <label htmlFor="picsum">
-                                    Picsum (random photos)
-                                </label>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                                <RadioGroupItem value="bing" id="bing" />
-                                <label htmlFor="bing">
-                                    Bing Image of the Day
-                                </label>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                                <RadioGroupItem value="local" id="local" />
-                                <label htmlFor="local">Local photos</label>
-                                <LuImageUp
-                                    onClick={() =>
-                                        setShowedPanel("photoSelector")
-                                    }
-                                    className="ml-2 cursor-pointer"
-                                />
-                            </div>
-                        </RadioGroup>
-                    </Field>
-                </FieldLabel>
+                <div className="rounded-md border border-primary/60 p-4">
+                    <FieldTitle>Photo source</FieldTitle>
+                    <RadioGroup
+                        value={wallpaperSettings.imageSource}
+                        onValueChange={updateImageSource}
+                        className="mt-3"
+                    >
+                        <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="picsum" id="picsum" />
+                            <label htmlFor="picsum">
+                                Picsum (random photos)
+                            </label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="bing" id="bing" />
+                            <label htmlFor="bing">Bing Image of the Day</label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="local" id="local" />
+                            <label htmlFor="local">Local photos</label>
+                            <LuImageUp
+                                onClick={() => setShowedPanel("photoSelector")}
+                                className="ml-2 cursor-pointer"
+                            />
+                        </div>
+                    </RadioGroup>
+                </div>
+
                 {wallpaperSettings.imageSource !== "bing" && (
-                    <FieldLabel className="border-primary/60">
+                    <div className="rounded-md border border-primary/60 p-4">
                         <Field orientation={"horizontal"}>
                             <FieldTitle>Image change interval</FieldTitle>
                             <NumberSelect
@@ -119,9 +110,10 @@ const WallpaperSettings: React.FC = () => {
                                 onValueChange={handleInterValMinutesChange}
                             />
                         </Field>
-                    </FieldLabel>
+                    </div>
                 )}
-                <FieldLabel className="border-primary/60">
+
+                <div className="rounded-md border border-primary/60 p-4">
                     <Field orientation={"horizontal"}>
                         <FieldTitle>Keep screen on</FieldTitle>
                         <NumberSelect
@@ -132,7 +124,7 @@ const WallpaperSettings: React.FC = () => {
                             onValueChange={handleWakeLockValueChange}
                         />
                     </Field>
-                </FieldLabel>
+                </div>
             </FieldGroup>
 
             {showedPanel === "photoSelector" && (

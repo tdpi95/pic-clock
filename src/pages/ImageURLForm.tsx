@@ -1,17 +1,11 @@
+import { Dialog } from "@/components/Dialog";
 import { Button } from "@/components/ui/button";
-import {
-    Dialog,
-    DialogContent,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { LuPlus, LuTrash } from "react-icons/lu";
 
 interface ImageURLFormProps {
-    onClose?: () => void;
+    onClose: () => void;
     onSave?: (urls: string[]) => void;
     maxUrls?: number;
 }
@@ -67,64 +61,61 @@ export default function ImageURLForm({
     };
 
     return (
-        <Dialog open={true} onOpenChange={onClose}>
-            <DialogContent>
-                <DialogHeader>
-                    <DialogTitle>Image URLs</DialogTitle>
-                </DialogHeader>
-
-                <div className="space-y-3 mt-4">
-                    {urls.map((url, index) => (
-                        <div
-                            key={index}
-                            className="flex gap-2 items-center animate-in fade-in slide-in-from-top-1"
-                        >
-                            <Input
-                                type="url"
-                                placeholder="https://example.com"
-                                value={url}
-                                onChange={(e) =>
-                                    handleUrlChange(index, e.target.value)
-                                }
-                                onKeyDown={(e) => handleKeyDown(e, index)}
-                                className="flex-1 url-input"
-                            />
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => removeUrlField(index)}
-                                disabled={urls.length === 1 && url === ""}
-                                className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                            >
-                                <LuTrash className="w-4 h-4" />
-                            </Button>
-                        </div>
-                    ))}
-                    <div className="flex gap-2 items-center">
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={addUrlField}
-                            className="flex-1 bg-white/60"
-                            disabled={urls.length >= maxUrls}
-                        >
-                            <LuPlus className="w-4 h-4" />
-                        </Button>
-                        <span className="w-9" />
-                    </div>
-                </div>
-
-                <DialogFooter>
-                    <Button
-                        variant="default"
-                        size="sm"
-                        onClick={() => save(urls)}
-                        className="mt-5"
+        <Dialog
+            visible={true}
+            onClose={onClose}
+            header="Image URLs"
+            footer={
+                <Button
+                    variant="default"
+                    size="sm"
+                    onClick={() => save(urls)}
+                    className="mt-5"
+                >
+                    Save
+                </Button>
+            }
+        >
+            <div className="space-y-3 mt-4">
+                {urls.map((url, index) => (
+                    <div
+                        key={index}
+                        className="flex gap-2 items-center animate-in fade-in slide-in-from-top-1"
                     >
-                        Save
+                        <Input
+                            type="url"
+                            placeholder="https://example.com"
+                            value={url}
+                            onChange={(e) =>
+                                handleUrlChange(index, e.target.value)
+                            }
+                            onKeyDown={(e) => handleKeyDown(e, index)}
+                            className="flex-1 url-input"
+                        />
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => removeUrlField(index)}
+                            disabled={urls.length === 1 && url === ""}
+                            className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                        >
+                            <LuTrash className="w-4 h-4" />
+                        </Button>
+                    </div>
+                ))}
+                <div className="flex gap-2 items-center">
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={addUrlField}
+                        className="flex-1 bg-white/60"
+                        disabled={urls.length >= maxUrls}
+                    >
+                        <LuPlus className="w-4 h-4" />
                     </Button>
-                </DialogFooter>
-            </DialogContent>
+                    <span className="w-9" />
+                </div>
+            </div>
         </Dialog>
     );
 }

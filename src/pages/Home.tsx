@@ -41,7 +41,6 @@ function Home() {
     const { changeDuration: changeWakeLockDuration } = useWakeLock(-1);
 
     const imgRef = useRef<HTMLImageElement | null>(null);
-    const containerRef = useRef<HTMLDivElement | null>(null);
 
     const photoStore = useImageStore("photos");
     const [photoKeys, setPhotoKeys] = useState<string[]>([]);
@@ -138,10 +137,8 @@ function Home() {
     }, [photoKeys]);
 
     const toggleFullscreen = () => {
-        if (!containerRef.current) return;
-
         if (!document.fullscreenElement) {
-            containerRef.current.requestFullscreen().catch((err) => {
+            document.documentElement.requestFullscreen().catch((err) => {
                 console.error(
                     "Error attempting to enable fullscreen mode:",
                     err,
@@ -153,10 +150,7 @@ function Home() {
     };
 
     return (
-        <div
-            className="relative min-h-screen w-full bg-linear-to-r from-blue-500 to-teal-800"
-            ref={containerRef}
-        >
+        <div className="relative min-h-screen w-full bg-linear-to-r from-blue-500 to-teal-800">
             {prevUrl && (
                 <img
                     src={prevUrl}

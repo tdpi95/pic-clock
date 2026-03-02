@@ -24,4 +24,4 @@
 
 - [x] Wake lock release doesn't work
 - [x] Release and request new wake lock when duration change
-- [ ] Dialogs don't show up in fullscreen
+- [x] Dialogs don't show up in fullscreen
