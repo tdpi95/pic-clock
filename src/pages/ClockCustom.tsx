@@ -1,3 +1,6 @@
+import FontSelector from "@/components/FontSelector";
+import FormField from "@/components/FormField";
+import { Button } from "@/components/ui/button";
 import {
     Field,
     FieldGroup,
@@ -7,9 +10,29 @@ import {
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Switch } from "@/components/ui/switch";
 import { useSettings, type MovementType } from "@/context/SettingsContext";
+import { loadGoogleFont } from "@/lib/utils";
+import { useEffect, useState } from "react";
+
+const fonts = [
+    "Inter",
+    "Open Sans",
+    "Playfair Display",
+    "Merriweather",
+    "Oswald",
+    "MonteCarlo",
+    "Aldrich",
+    "Shizuru",
+];
 
 const ClockCustom = () => {
     const { clockSettings, updateSettings } = useSettings();
+    const [showedPanel, setShowedPanel] = useState<"none" | "photoSelector">(
+        "none",
+    );
+
+    useEffect(() => {
+        loadGoogleFont(clockSettings.font);
+    }, [clockSettings.font]);
 
     const updateMovement = (movement: MovementType) => {
         updateSettings({
@@ -38,6 +61,19 @@ const ClockCustom = () => {
         });
     };
 
+    const handleSelectorOpen = () => {
+        fonts.forEach(loadGoogleFont);
+    };
+
+    const updateFont = (font: string) => {
+        updateSettings({
+            clock: {
+                ...clockSettings,
+                font,
+            },
+        });
+    };
+
     return (
         <div className="p-4">
             <FieldGroup>
@@ -59,39 +95,55 @@ const ClockCustom = () => {
                         />
                     </Field>
                 </FieldLabel>
-                <FieldLabel>
-                    <Field>
-                        <FieldTitle>Movement</FieldTitle>
-                        <RadioGroup
-                            value={clockSettings?.movement}
-                            onValueChange={(value: MovementType) => {
-                                updateMovement(value);
+                <FormField label="Font" orientation="horizontal">
+                    <Button
+                        variant="outline-ghost"
+                        onClick={() => setShowedPanel("photoSelector")}
+                    >
+                        <p
+                            style={{
+                                fontFamily: `'${clockSettings.font}', sans-serif`,
                             }}
                         >
-                            <div className="flex items-center space-x-2">
-                                <RadioGroupItem
-                                    value="continuous"
-                                    id="continuous"
-                                />
-                                <label htmlFor="continuous">
-                                    Continuous (DVD logo bounce)
-                                </label>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                                <RadioGroupItem
-                                    value="interval"
-                                    id="interval"
-                                />
-                                <label htmlFor="interval">Interval</label>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                                <RadioGroupItem value="static" id="static" />
-                                <label htmlFor="static">Static</label>
-                            </div>
-                        </RadioGroup>
-                    </Field>
-                </FieldLabel>
+                            {clockSettings.font}
+                        </p>
+                    </Button>
+                </FormField>
+                <FormField label="Movement" orientation="vertical">
+                    <RadioGroup
+                        value={clockSettings?.movement}
+                        onValueChange={(value: MovementType) => {
+                            updateMovement(value);
+                        }}
+                    >
+                        <div className="flex items-center space-x-2">
+                            <RadioGroupItem
+                                value="continuous"
+                                id="continuous"
+                            />
+                            <label htmlFor="continuous">
+                                Continuous (DVD logo bounce)
+                            </label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="interval" id="interval" />
+                            <label htmlFor="interval">Interval</label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="static" id="static" />
+                            <label htmlFor="static">Static</label>
+                        </div>
+                    </RadioGroup>
+                </FormField>
             </FieldGroup>
+
+            <FontSelector
+                visible={showedPanel === "photoSelector"}
+                onSelect={updateFont}
+                onClose={() => setShowedPanel("none")}
+                onOpen={handleSelectorOpen}
+                fonts={fonts}
+            />
         </div>
     );
 };

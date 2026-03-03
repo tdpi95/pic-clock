@@ -1,24 +1,16 @@
+import { useSettings } from "@/context/SettingsContext";
 import { useEffect, useRef } from "react";
 
-type MovementType = "static" | "interval" | "continuous";
-
 type Props = {
-    movement?: MovementType;
-    intervalMs?: number; // for "interval" mode
     moving?: boolean;
-    _24h?: boolean;
 };
 
 const SPEED = 80;
 const PANEL_WIDTH = 260;
 const PANEL_HEIGHT = 120;
 
-export default function FloatingClock({
-    movement = "continuous",
-    intervalMs = 10000,
-    moving = true,
-    _24h = false,
-}: Props) {
+export default function FloatingClock({ moving = true }: Props) {
+    const { clockSettings } = useSettings();
     const containerRef = useRef<HTMLDivElement>(null);
 
     const hourRef = useRef<HTMLSpanElement>(null);
@@ -64,7 +56,7 @@ export default function FloatingClock({
         const m = now.getMinutes();
         const s = now.getSeconds();
 
-        const hours = _24h
+        const hours = clockSettings._24h
             ? String(h).padStart(2, "0")
             : String(h % 12 || 12).padStart(2, "0");
         const minutes = String(m).padStart(2, "0");
@@ -111,6 +103,8 @@ export default function FloatingClock({
 
         let rafId: number;
         let intervalId: number | undefined;
+        const movement = clockSettings.movement;
+        const intervalMs = clockSettings.moveInterval;
 
         // STATIC
         if (movement === "static") {
@@ -189,7 +183,7 @@ export default function FloatingClock({
             if (intervalId) clearInterval(intervalId);
             if (rafId) cancelAnimationFrame(rafId);
         };
-    }, [movement, intervalMs, moving, _24h]);
+    }, [clockSettings, moving]);
 
     return (
         <div ref={containerRef} className="fixed">
@@ -197,8 +191,16 @@ export default function FloatingClock({
                 className={`backdrop-blur-md bg-white/10 border border-white/20 shadow-lg rounded-2xl px-8 py-6 text-center text-white  flex flex-col justify-center`}
             >
                 {/* Time */}
-                <div className="flex items-end justify-center gap-1 drop-shadow-[0_1px_1px_rgba(0,0,0,0.2)]">
-                    <span ref={hourRef} className="text-5xl font-semibold">
+                <div
+                    className="flex items-end justify-center gap-1 drop-shadow-[0_1px_1px_rgba(0,0,0,0.2)]"
+                    style={{
+                        fontFamily: `'${clockSettings.font}', sans-serif`,
+                    }}
+                >
+                    <span
+                        ref={hourRef}
+                        className="text-5xl font-semibold font-(${clockSettings.font})"
+                    >
                         00
                     </span>
                     <span className="text-5xl">:</span>
@@ -206,7 +208,7 @@ export default function FloatingClock({
                         00
                     </span>
                     <div className="flex flex-col items-start leading-none ml-0 mb-0">
-                        {!_24h && (
+                        {!clockSettings._24h && (
                             <span
                                 ref={ampmRef}
                                 className="text-[10px] opacity-70"
@@ -225,6 +227,9 @@ export default function FloatingClock({
                 <div
                     ref={dateRef}
                     className="text-md mt-2 opacity-80 drop-shadow-[0_1px_1px_rgba(0,0,0,0.2)]"
+                    style={{
+                        fontFamily: `'${clockSettings.font}', sans-serif`,
+                    }}
                 >
                     Loading...
                 </div>

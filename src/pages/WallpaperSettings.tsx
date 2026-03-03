@@ -4,7 +4,8 @@ import { RadioGroup, RadioGroupItem } from "../components/ui/radio-group";
 import PhotoSelector from "./PhotoSelector";
 import { LuImageUp } from "react-icons/lu";
 import { NumberSelect } from "@/components/NumberSelect";
-import { Field, FieldGroup, FieldTitle } from "@/components/ui/field";
+import { FieldGroup } from "@/components/ui/field";
+import FormField from "@/components/FormField";
 
 type PanelType = "main" | "photoSelector" | "clockSettings";
 
@@ -70,8 +71,7 @@ const WallpaperSettings: React.FC = () => {
     return (
         <div className="p-4">
             <FieldGroup>
-                <div className="rounded-md border border-primary/60 p-4">
-                    <FieldTitle>Photo source</FieldTitle>
+                <FormField label="Photo source" orientation="vertical">
                     <RadioGroup
                         value={wallpaperSettings.imageSource}
                         onValueChange={updateImageSource}
@@ -96,35 +96,32 @@ const WallpaperSettings: React.FC = () => {
                             />
                         </div>
                     </RadioGroup>
-                </div>
+                </FormField>
 
                 {wallpaperSettings.imageSource !== "bing" && (
-                    <div className="rounded-md border border-primary/60 p-4">
-                        <Field orientation={"horizontal"}>
-                            <FieldTitle>Image change interval</FieldTitle>
-                            <NumberSelect
-                                values={[1, 5, 10, 30, 60]}
-                                unit="minute"
-                                selectedValue={intervalMinutes}
-                                min={1}
-                                onValueChange={handleInterValMinutesChange}
-                            />
-                        </Field>
-                    </div>
+                    <FormField
+                        label="Image change interval"
+                        orientation="horizontal"
+                    >
+                        <NumberSelect
+                            values={[1, 5, 10, 30, 60]}
+                            unit="minute"
+                            selectedValue={intervalMinutes}
+                            min={1}
+                            onValueChange={handleInterValMinutesChange}
+                        />
+                    </FormField>
                 )}
 
-                <div className="rounded-md border border-primary/60 p-4">
-                    <Field orientation={"horizontal"}>
-                        <FieldTitle>Keep screen on</FieldTitle>
-                        <NumberSelect
-                            values={["Disabled", "Always on", 5, 10, 30]}
-                            unit="minute"
-                            selectedValue={wakeLockValue}
-                            min={1}
-                            onValueChange={handleWakeLockValueChange}
-                        />
-                    </Field>
-                </div>
+                <FormField label="Keep screen on" orientation="horizontal">
+                    <NumberSelect
+                        values={["Disabled", "Always on", 5, 10, 30]}
+                        unit="minute"
+                        selectedValue={wakeLockValue}
+                        min={1}
+                        onValueChange={handleWakeLockValueChange}
+                    />
+                </FormField>
             </FieldGroup>
 
             {showedPanel === "photoSelector" && (

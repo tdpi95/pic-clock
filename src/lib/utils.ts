@@ -9,7 +9,7 @@ export function cn(...inputs: ClassValue[]) {
  * Generates a UUID v4. Falls back to a manual implementation
  * if crypto.randomUUID is unavailable (e.g., insecure contexts like LAN/HTTP).
  */
-export const generateUUID = (): string => {
+export function generateUUID(): string {
     if (typeof window !== "undefined" && window.crypto?.randomUUID) {
         return window.crypto.randomUUID();
     }
@@ -21,4 +21,19 @@ export const generateUUID = (): string => {
             (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (c / 4)))
         ).toString(16);
     });
-};
+}
+
+export function loadGoogleFont(font: string) {
+    const id = `gf-${font.replace(/\s+/g, "-")}`;
+    if (document.getElementById(id)) return;
+
+    const link = document.createElement("link");
+    link.id = id;
+    link.rel = "stylesheet";
+    link.href = `https://fonts.googleapis.com/css2?family=${font.replace(
+        /\s+/g,
+        "+",
+    )}:wght@400;600&display=swap`;
+
+    document.head.appendChild(link);
+}

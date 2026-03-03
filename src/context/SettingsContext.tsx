@@ -58,7 +58,7 @@ const defaultSettings: Settings = {
         position: { x: 100, y: 100 },
         color1: "#ffffff",
         color2: "#000000",
-        font: "Arial",
+        font: "Inter",
         bgOpacity: 20,
     },
 };
