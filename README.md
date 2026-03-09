@@ -1,8 +1,9 @@
-# Picclock 🖼️🕙
+# PicClock
 
-Picclock is a React web app that turns any PC, tablet, or phone into a digital photo frame with a clock overlay.
+PicClock is a React web app that turns any PC, tablet, or phone into a digital photo frame with a clock overlay.
 
-![screenshot](./docs/screenshot.png)
+You can use the pre-built version immediately at:
+https://tdpi95.github.io/picclock/
 
 ---
 
@@ -40,7 +41,7 @@ Picclock is a React web app that turns any PC, tablet, or phone into a digital p
 
 ---
 
-## Getting started
+## 🛠 Getting started
 
 ```bash
 git clone https://github.com/tdpi95/picclock.git
