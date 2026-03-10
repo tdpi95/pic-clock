@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 
-interface Position {
+export interface Position {
     x: number;
     y: number;
 }
@@ -84,7 +84,7 @@ const defaultClockSettings: ClockSettings = {
     _24h: false,
     movement: "continuous",
     moveInterval: 10000,
-    position: { x: 100, y: 100 },
+    position: { x: 10, y: 10 },
     color1: "#ffffff",
     color2: "#000000",
     font: "Inter",

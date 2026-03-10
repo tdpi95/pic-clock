@@ -1,5 +1,6 @@
 import FontSelector from "@/components/FontSelector";
 import FormField from "@/components/FormField";
+import PositionSelector from "@/components/PositionSelector";
 import { Button } from "@/components/ui/button";
 import {
     Field,
@@ -9,7 +10,11 @@ import {
 } from "@/components/ui/field";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Switch } from "@/components/ui/switch";
-import { useSettings, type MovementType } from "@/context/SettingsContext";
+import {
+    useSettings,
+    type MovementType,
+    type Position,
+} from "@/context/SettingsContext";
 import { loadGoogleFont } from "@/lib/utils";
 import { useEffect, useState } from "react";
 
@@ -26,9 +31,9 @@ const fonts = [
 
 const ClockCustom = () => {
     const { clockSettings, updateClockSettings } = useSettings();
-    const [showedPanel, setShowedPanel] = useState<"none" | "photoSelector">(
-        "none",
-    );
+    const [showedPanel, setShowedPanel] = useState<
+        "none" | "photoSelector" | "positionSelector"
+    >("none");
 
     useEffect(() => {
         loadGoogleFont(clockSettings.font);
@@ -52,6 +57,10 @@ const ClockCustom = () => {
 
     const updateFont = (font: string) => {
         updateClockSettings({ ...clockSettings, font });
+    };
+
+    const updatePosition = (position: Position) => {
+        updateClockSettings({ ...clockSettings, position });
     };
 
     return (
@@ -115,6 +124,17 @@ const ClockCustom = () => {
                         </div>
                     </RadioGroup>
                 </FormField>
+
+                {clockSettings.movement == "static" && (
+                    <FormField label="Position" orientation="horizontal">
+                        <Button
+                            variant="outline-ghost"
+                            onClick={() => setShowedPanel("positionSelector")}
+                        >
+                            Position
+                        </Button>
+                    </FormField>
+                )}
             </FieldGroup>
 
             <FontSelector
@@ -123,6 +143,12 @@ const ClockCustom = () => {
                 onClose={() => setShowedPanel("none")}
                 onOpen={handleSelectorOpen}
                 fonts={fonts}
+            />
+
+            <PositionSelector
+                visible={showedPanel === "positionSelector"}
+                onConfirm={updatePosition}
+                onClose={() => setShowedPanel("none")}
             />
         </div>
     );
