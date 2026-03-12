@@ -37,6 +37,18 @@ const PositionSelector = ({ visible, onConfirm, onClose }: Props) => {
     const [isSnapped, setIsSnapped] = useState(false);
 
     const containerRef = useRef<HTMLDivElement>(null);
+    const [aspectRatio, setAspectRatio] = useState(
+        window.innerWidth / window.innerHeight,
+    );
+
+    useEffect(() => {
+        const updateRatio = () => {
+            setAspectRatio(window.innerWidth / window.innerHeight);
+        };
+        window.addEventListener("resize", updateRatio);
+        return () => window.removeEventListener("resize", updateRatio);
+    }, []);
+
     const SNAP_THRESHOLD = 5; // Sensitivity of the "magnet"
 
     const time = formatTime(clockSettings._24h);
@@ -110,10 +122,11 @@ const PositionSelector = ({ visible, onConfirm, onClose }: Props) => {
             onClose={close}
             footer={<Button onClick={confirm}>SAVE POSITION</Button>}
         >
-            <div className="flex flex-col items-center">
+            <div className="flex flex-col items-center w-full">
                 <div
                     ref={containerRef}
-                    className="relative w-80 h-48 md:w-155 md:h-100 bg-zinc-800 border-2 border-zinc-500 rounded-xl overflow-hidden touch-none"
+                    className="relative w-full bg-zinc-800 border-2 border-zinc-500 rounded-xl overflow-hidden touch-none"
+                    style={{ aspectRatio: aspectRatio }}
                 >
                     {/* Snap Guides */}
                     <div

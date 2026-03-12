@@ -109,7 +109,10 @@ export default function FloatingClock({ moving = true }: Props) {
 
         // STATIC
         if (movement === "static") {
-            applyTransform(position.current.x, position.current.y);
+            // applyTransform(position.current.x, position.current.y);
+            const x = window.innerWidth * clockSettings.position.x / 100 - panelWidth / 2;
+            const y = window.innerHeight * clockSettings.position.y / 100 - PANEL_HEIGHT / 2;
+            applyTransform(x, y);
         }
 
         // INTERVAL JUMP
