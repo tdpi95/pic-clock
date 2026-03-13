@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/field";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Switch } from "@/components/ui/switch";
+import { Slider } from "@/components/ui/slider";
 import {
     useSettings,
     type MovementType,
@@ -97,6 +98,25 @@ const ClockCustom = () => {
                             {clockSettings.font}
                         </p>
                     </Button>
+                </FormField>
+                <FormField label="Size" orientation="horizontal">
+                    <div className="flex items-center gap-4 w-48">
+                        <Slider
+                            min={1}
+                            max={20}
+                            step={0.1}
+                            value={clockSettings.fontSize}
+                            onValueChange={(val) =>
+                                updateClockSettings({
+                                    ...clockSettings,
+                                    fontSize: val,
+                                })
+                            }
+                        />
+                        <span className="text-sm font-mono w-10 text-right">
+                            {clockSettings.fontSize.toFixed(1)}
+                        </span>
+                    </div>
                 </FormField>
                 <FormField label="Movement" orientation="vertical">
                     <RadioGroup

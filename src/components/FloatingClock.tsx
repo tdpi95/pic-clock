@@ -101,6 +101,10 @@ export default function FloatingClock({ moving = true }: Props) {
         if (containerRef.current) {
             panelWidth = containerRef.current.offsetWidth;
         }
+        let panelHeight = PANEL_HEIGHT;
+        if (containerRef.current) {
+            panelHeight = containerRef.current.offsetHeight;
+        }
 
         let rafId: number;
         let intervalId: number | undefined;
@@ -111,7 +115,7 @@ export default function FloatingClock({ moving = true }: Props) {
         if (movement === "static") {
             // applyTransform(position.current.x, position.current.y);
             const x = window.innerWidth * clockSettings.position.x / 100 - panelWidth / 2;
-            const y = window.innerHeight * clockSettings.position.y / 100 - PANEL_HEIGHT / 2;
+            const y = window.innerHeight * clockSettings.position.y / 100 - panelHeight / 2;
             applyTransform(x, y);
         }
 
@@ -161,7 +165,7 @@ export default function FloatingClock({ moving = true }: Props) {
                 y += velocity.current.vy * dt;
 
                 const maxX = window.innerWidth - panelWidth;
-                const maxY = window.innerHeight - PANEL_HEIGHT - 8;
+                const maxY = window.innerHeight - panelHeight;
 
                 if (x <= 0 || x >= maxX) {
                     velocity.current.vx *= -1;
@@ -193,39 +197,67 @@ export default function FloatingClock({ moving = true }: Props) {
         loadGoogleFont(clockSettings.font);
     }, [clockSettings.font]);
 
+    const textSize = 20 * Math.pow(1.15, clockSettings.fontSize - 1);
+
     return (
         <div ref={containerRef} className="fixed">
             <div
-                className={`backdrop-blur-md bg-white/10 border border-white/20 shadow-lg rounded-2xl px-8 py-6 text-center text-white  flex flex-col justify-center`}
+                className={`backdrop-blur-md bg-white/10 border border-white/20 shadow-lg rounded-2xl px-8 pt-3 pb-6 text-center text-white  flex flex-col justify-center`}
             >
                 {/* Time */}
                 <div
-                    className="flex items-end justify-center gap-1 drop-shadow-[0_1px_1px_rgba(0,0,0,0.2)]"
+                    className="flex items-baseline justify-center gap-1 drop-shadow-[0_1px_1px_rgba(0,0,0,0.2)]"
                     style={{
                         fontFamily: `'${clockSettings.font}', sans-serif`,
+                        fontVariantNumeric: "tabular-nums",
                     }}
                 >
                     <span
                         ref={hourRef}
-                        className="text-5xl font-semibold font-(${clockSettings.font})"
+                        className="font-semibold inline-block text-right"
+                        style={{ 
+                            fontSize: `${textSize}px`,
+                            minWidth: "1em"
+                        }}
                     >
                         00
                     </span>
-                    <span className="text-5xl">:</span>
-                    <span ref={minuteRef} className="text-5xl font-semibold">
+                    <span
+                        style={{ fontSize: `${textSize}px` }}
+                    >
+                        :
+                    </span>
+                    <span
+                        ref={minuteRef}
+                        className="inline-block text-left"
+                        style={{ 
+                            fontSize: `${textSize}px`,
+                            minWidth: "1em"
+                        }}
+                    >
                         00
                     </span>
-                    <div className="flex flex-col items-start leading-none ml-0 mb-0">
+                    <div className="relative ml-0 flex items-baseline">
                         {!clockSettings._24h && (
                             <span
                                 ref={ampmRef}
-                                className="text-[10px] opacity-70"
+                                className="absolute bottom-[100%] left-0 opacity-70 leading-none"
+                                style={{
+                                    fontSize: `${textSize * 0.3}px`
+                                }}
                             >
                                 AM
                             </span>
                         )}
 
-                        <span ref={secondRef} className="text-sm">
+                        <span
+                            ref={secondRef}
+                            className="inline-block"
+                            style={{
+                                fontSize: `${textSize * 0.3}px`,
+                                minWidth: "2ch"
+                            }}
+                        >
                             00
                         </span>
                     </div>
@@ -234,9 +266,10 @@ export default function FloatingClock({ moving = true }: Props) {
                 {/* Date */}
                 <div
                     ref={dateRef}
-                    className="text-md mt-2 opacity-80 drop-shadow-[0_1px_1px_rgba(0,0,0,0.2)]"
+                    className="opacity-80 drop-shadow-[0_1px_1px_rgba(0,0,0,0.2)]"
                     style={{
                         fontFamily: `'${clockSettings.font}', sans-serif`,
+                        fontSize: `${textSize * 0.3}px`,
                     }}
                 >
                     Loading...

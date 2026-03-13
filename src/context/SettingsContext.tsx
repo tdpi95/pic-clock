@@ -16,6 +16,7 @@ export interface ClockSettings {
     color1: string;
     color2: string;
     font: string;
+    fontSize: number;
     bgOpacity: number;
     bgBlur: boolean;
 }
@@ -88,6 +89,7 @@ const defaultClockSettings: ClockSettings = {
     color1: "#ffffff",
     color2: "#000000",
     font: "Inter",
+    fontSize: 10,
     bgOpacity: 20,
     bgBlur: true,
 };
@@ -143,18 +145,26 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({
     useEffect(() => {
         if (!isInitialized) return;
 
-        console.log(
-            "Save wallpaper settings to localStorage:",
-            wallpaperSettings,
-        );
-        localStorage.setItem("wallpaper", JSON.stringify(wallpaperSettings));
+        const timeoutId = setTimeout(() => {
+            console.log(
+                "Save wallpaper settings to localStorage:",
+                wallpaperSettings,
+            );
+            localStorage.setItem("wallpaper", JSON.stringify(wallpaperSettings));
+        }, 500);
+
+        return () => clearTimeout(timeoutId);
     }, [wallpaperSettings, isInitialized]);
 
     useEffect(() => {
         if (!isInitialized) return;
 
-        console.log("Save clock settings to localStorage:", clockSettings);
-        localStorage.setItem("clock", JSON.stringify(clockSettings));
+        const timeoutId = setTimeout(() => {
+            console.log("Save clock settings to localStorage:", clockSettings);
+            localStorage.setItem("clock", JSON.stringify(clockSettings));
+        }, 500);
+
+        return () => clearTimeout(timeoutId);
     }, [clockSettings, isInitialized]);
 
     const updateWallpaperSettings = (
