@@ -142,9 +142,8 @@ const PositionSelector = ({ visible, onConfirm, onClose }: Props) => {
                         onMouseDown={() => setIsDragging(true)}
                         onTouchStart={() => setIsDragging(true)}
                         style={{
-                            /* Ensures the clock body stays inside the container boundaries by offsetting the 50% transform translation. */
-                            left: `calc(${position.x}% + ${(50 - position.x) * 0.8}px)`,
-                            top: `calc(${position.y}% + ${(50 - position.y) * 0.4}px)`,
+                            left: `${position.x}%`,
+                            top: `${position.y}%`,
                             transform: "translate(-50%, -50%)",
                         }}
                         className={`
